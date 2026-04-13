@@ -25,20 +25,6 @@
                     <input id="apellidosProfesor" type="text" placeholder="Ej. Pérez"
                         [(ngModel)]="nuevoProfesor.apellidos" name="apellidos" required class="input-profesor" />
                 </div>
-                <div class="input-group">
-                    <label for="emailProfesor">Email</label>
-                    <input id="emailProfesor" type="email" placeholder="ejemplo@uteq.edu.mx"
-                        [(ngModel)]="nuevoProfesor.email" name="email" required class="input-profesor" />
-                </div>
-
-                <div class="input-group">
-                    <label for="canBeTutorSelect">¿Puede ser tutor?</label>
-                    <select id="canBeTutorSelect" [(ngModel)]="nuevoProfesor.can_be_tutor" name="can_be_tutor"
-                        class="input-profesor">
-                        <option [ngValue]="false">No</option>
-                        <option [ngValue]="true">Sí</option>
-                    </select>
-                </div>
                 <!-- <div class ="input-group">
                     <label for="horaEmpezarProfesor">Hora que empieza a trabajar</label>
                     <input id="horaEmpezarProfesor" type="time" [(ngModel)]="nuevoProfesor.hora_empezar" name="hora_empezar" required class="input-profesor" />
@@ -73,8 +59,6 @@
                 <tr>
                     <th>Nombre</th>
                     <th>Apellidos</th>
-                    <th>Email</th>
-                    <th>Tutor</th>
                     <th>Materias</th>
                     <th class="th-actions">Acciones</th>
                 </tr>
@@ -83,13 +67,6 @@
                 <tr *ngFor="let profesor of profesores">
                     <td class="td-nombre">{{ profesor.nombre }}</td>
                     <td>{{ profesor.apellidos }}</td>
-                    <td>{{ profesor.email }}</td>
-                    <td>
-                        <span class="badge" [class.badge-tutor]="profesor.can_be_tutor"
-                            [class.badge-no-tutor]="!profesor.can_be_tutor">
-                            {{ profesor.can_be_tutor ? 'Sí' : 'No' }}
-                        </span>
-                    </td>
                     <td>
                         <div class="materias-list">
                             <span *ngIf="profesor.materias && profesor.materias.length; else sinMaterias">
@@ -117,7 +94,7 @@
                     </td>
                 </tr>
                 <tr *ngIf="profesores.length === 0">
-                    <td colspan="6" class="empty-state">
+                    <td colspan="4" class="empty-state">
                         No hay profesores registrados. ¡Agrega uno nuevo arriba!
                     </td>
                 </tr>

@@ -9,8 +9,6 @@ export interface ProfesorData {
   profesor_id: string;
   nombre: string;
   apellidos: string;
-  email: string;
-  can_be_tutor?: boolean;
   materias?: string[];
   metadata?: object;
 }
@@ -30,8 +28,6 @@ export class ProfesoresComponent {
     profesor_id: '',
     nombre: '',
     apellidos: '',
-    email: '',
-    can_be_tutor: false,
     materias: [],
     metadata: {}
   };
@@ -119,8 +115,6 @@ export class ProfesoresComponent {
     const body = {
       nombre,
       apellidos,
-      email: this.nuevoProfesor.email,
-      can_be_tutor: !!this.nuevoProfesor.can_be_tutor,
       materias: this.nuevoProfesor.materias,
       metadata: this.nuevoProfesor.metadata
     };
@@ -129,8 +123,6 @@ export class ProfesoresComponent {
     const existe = this.profesores.some(p =>
       p.nombre === this.nuevoProfesor.nombre &&
       p.apellidos === this.nuevoProfesor.apellidos &&
-      p.email === this.nuevoProfesor.email &&
-      p.can_be_tutor === this.nuevoProfesor.can_be_tutor &&
       JSON.stringify(p.materias) === JSON.stringify(this.nuevoProfesor.materias) &&
       JSON.stringify(p.metadata) === JSON.stringify(this.nuevoProfesor.metadata)
     );
@@ -149,22 +141,20 @@ export class ProfesoresComponent {
       const data = await res.json();
       // Usar el id real devuelto por el backend
       this.profesores.push({ ...this.nuevoProfesor, profesor_id: data.profesor_id });
-      this.nuevoProfesor = { profesor_id: '', nombre: '', apellidos: '', email: '', can_be_tutor: false, materias: [], metadata: {} };
+      this.nuevoProfesor = { profesor_id: '', nombre: '', apellidos: '', materias: [], metadata: {} };
     } catch (err) {
       alert('No se pudo crear el profesor: ' + err);
     }
   }
 
   async guardarEdicion() {
-    if (!this.nuevoProfesor.nombre.trim() || !this.nuevoProfesor.email.trim()) return;
+    if (!this.nuevoProfesor.nombre.trim()) return;
     if (!this.editandoId) return;
 
     // Usar los campos tal cual del formulario
     const body: any = {
       nombre: this.nuevoProfesor.nombre.trim(),
       apellidos: this.nuevoProfesor.apellidos.trim(),
-      email: this.nuevoProfesor.email,
-      can_be_tutor: !!this.nuevoProfesor.can_be_tutor,
       materias: this.nuevoProfesor.materias,
       metadata: this.nuevoProfesor.metadata
     };
@@ -181,7 +171,7 @@ export class ProfesoresComponent {
       this.profesores = this.profesores.map(p =>
         p.profesor_id === this.editandoId ? { ...p, ...body, profesor_id: p.profesor_id } : p
       );
-      this.nuevoProfesor = { profesor_id: '', nombre: '', apellidos: '', email: '', can_be_tutor: false, materias: [], metadata: {} };
+      this.nuevoProfesor = { profesor_id: '', nombre: '', apellidos: '', materias: [], metadata: {} };
       this.editandoId = null;
       //recagar la lista de profesores para asegurar consistencia
       this.cargarProfesores();
@@ -220,7 +210,7 @@ export class ProfesoresComponent {
   }
 
   cancelarEdicion() {
-    this.nuevoProfesor = { profesor_id: '', nombre: '', apellidos: '', email: '', can_be_tutor: false, materias: [], metadata: {} };
+    this.nuevoProfesor = { profesor_id: '', nombre: '', apellidos: '', materias: [], metadata: {} };
     this.editandoId = null;
   }
 }

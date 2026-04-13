@@ -261,7 +261,7 @@ $success: #27ae60;
 
   &.badge-tutor {
     background: color.adjust($success, $lightness: 40%);
-    color: darken($success, 10%);
+    color: color.adjust($success, $lightness: -10%);
   }
 
   &.badge-no-tutor {

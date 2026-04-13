@@ -10,13 +10,13 @@
                     <line x1="3" y1="10" x2="21" y2="10"></line>
                 </svg>
             </div>
-            <h1>Horarios UTEQ</h1>
+            <h1>Sistema de Horarios</h1>
             <p class="subtitle">Bienvenido, ingresa tus credenciales</p>
         </div>
 
         <form (ngSubmit)="iniciarSesion()" class="login-form">
             <div class="form-group">
-                <label for="usuario">Correo Institucional</label>
+                <label for="usuario">Correo</label>
                 <div class="input-wrapper">
                     <span class="input-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -26,7 +26,7 @@
                             <polyline points="22,6 12,13 2,6"></polyline>
                         </svg>
                     </span>
-                    <input id="usuario" type="email" placeholder="ejemplo@uteq.edu.mx" [(ngModel)]="email" name="email"
+                    <input id="usuario" type="email" placeholder="usuario@escuela.edu" [(ngModel)]="email" name="email"
                         required />
                 </div>
             </div>
@@ -71,7 +71,7 @@
         </form>
 
         <div class="login-footer">
-            <p>© 2025 Universidad Tecnológica de Querétaro</p>
+            <p>© 2025 Sistema de Horarios Escolar</p>
         </div>
     </div>
 </div>

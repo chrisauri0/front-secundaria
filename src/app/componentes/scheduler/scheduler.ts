@@ -140,7 +140,7 @@ export class SchedulerComponent {
     doc.text(`Horario de Grupo`, 14, 13);
 
     doc.setFontSize(10);
-    doc.text(`Horari - UTEQ`, 180, 13, { align: 'right' });
+    doc.text(`Sistema de Horarios`, 180, 13, { align: 'right' });
 
     // Información del grupo
     doc.setTextColor(0, 0, 0);
@@ -198,7 +198,7 @@ export class SchedulerComponent {
       doc.setPage(i);
       doc.setFontSize(8);
       doc.setTextColor(150);
-      doc.text('Documento generado automáticamente por el sistema de horarios UTEQ', 105, 290, { align: 'center' });
+      doc.text('Documento generado automáticamente por el sistema de horarios escolar', 105, 290, { align: 'center' });
     }
 
     doc.save(`horario_${group.nombregrupo}.pdf`);
@@ -223,7 +223,7 @@ export class SchedulerComponent {
     doc.text(`Horario de Profesor`, 14, 13);
 
     doc.setFontSize(10);
-    doc.text(`Horari - UTEQ`, 180, 13, { align: 'right' });
+    doc.text(`Sistema de Horarios`, 180, 13, { align: 'right' });
 
     // Información del profesor
     doc.setTextColor(0, 0, 0);
@@ -294,7 +294,7 @@ export class SchedulerComponent {
       doc.setPage(i);
       doc.setFontSize(8);
       doc.setTextColor(150);
-      doc.text('Documento generado automáticamente por el sistema de horarios UTEQ', 105, 290, { align: 'center' });
+      doc.text('Documento generado automáticamente por el sistema de horarios escolar', 105, 290, { align: 'center' });
     }
 
     doc.save(`horario_profesor_${prof.nombre}.pdf`);

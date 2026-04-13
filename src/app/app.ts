@@ -18,7 +18,7 @@ import { filter } from 'rxjs/operators';
 })
 export class App implements OnInit {
   /** Título de la aplicación */
-  protected readonly title = signal('horarios-uteq');
+  protected readonly title = signal('sistema-de-horarios');
 
   /** Nombre del usuario autenticado */
   usuarioNombre: string = '';
@@ -53,7 +53,7 @@ export class App implements OnInit {
         this.usuarioNombre = typeof parsed.nombre === 'string' ? parsed.nombre : 'Usuario';
         this.usuarioCarrera = typeof parsed.carrera === 'string' ? parsed.carrera : 'N/A';
       } else {
-        this.usuarioNombre = 'Director de la división de Tecnologías de la Información';
+        this.usuarioNombre = 'Coordinación Académica';
         this.usuarioCarrera = 'N/A';
       }
     } catch (error) {
