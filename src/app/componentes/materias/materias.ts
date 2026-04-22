@@ -3,30 +3,36 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { ConfirmDialogService } from '../shared/confirm-dialog/confirm-dialog.service';
 
 export interface Materia {
   id: string;
   nombre: string;
   grado?: number;
   horas_semana: number;
+  permitir_doble_bloque?: boolean;
   data?: object;
   salones?: string[] | string | null;
 }
 
 @Component({
   selector: 'app-materias',
+  standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './materias.html',
   styleUrl: './materias.scss'
 })
 export class Materias {
   materias: Materia[] = [];
-  nuevaMateria: Materia = { id: '', nombre: '', grado: 1, horas_semana: 1, data: {}, salones: '' };
+  nuevaMateria: Materia = { id: '', nombre: '', grado: 1, horas_semana: 1, permitir_doble_bloque: false, data: {}, salones: [] };
+  selectedSalones: string[] = [];
   editandoId: string | null = null;
   salones: string[] = [];
   toastVisible = false;
   toastMessage = '';
   toastType: 'success' | 'error' | 'warning' = 'success';
+
+  constructor(private confirmDialog: ConfirmDialogService) {}
 
   ngOnInit() {
     this.cargarMaterias();
@@ -61,8 +67,21 @@ export class Materias {
   private isNombreDuplicado(nombre: string, excludeId?: string): boolean {
     const normalized = this.normalizeMateriaName(nombre);
     return this.materias.some((m) =>
-      m.id !== excludeId && this.normalizeMateriaName(m.nombre) === normalized
+      m.id !== excludeId && this.normalizeMateriaName(m.nombre) === normalized && (m.grado ?? 1) === (this.nuevaMateria.grado ?? 1)
     );
+  }
+
+  getGradoLabel(grado?: number): string {
+    switch (grado) {
+      case 1:
+        return '1°';
+      case 2:
+        return '2°';
+      case 3:
+        return '3°';
+      default:
+        return 'Sin grado';
+    }
   }
 
   private normalizeSalones(value: unknown): string[] {
@@ -78,6 +97,22 @@ export class Materias {
   formatSalones(value: unknown): string {
     const normalized = this.normalizeSalones(value);
     return normalized.length > 0 ? normalized.join(', ') : 'Sin salón';
+  }
+
+  toggleSalonSelection(salon: string, checked: boolean) {
+    if (checked) {
+      if (this.selectedSalones.includes(salon)) {
+        return;
+      }
+      if (this.selectedSalones.length >= 2) {
+        this.showToast('Solo puedes seleccionar hasta 2 salones', 'warning');
+        return;
+      }
+      this.selectedSalones = [...this.selectedSalones, salon];
+      return;
+    }
+
+    this.selectedSalones = this.selectedSalones.filter((s) => s !== salon);
   }
 
   async cargarSalones() {
@@ -120,6 +155,7 @@ export class Materias {
         nombre: m.nombre,
         grado: m.grado,
         horas_semana: m.horas_semana,
+        permitir_doble_bloque: Boolean(m.permitir_doble_bloque),
         data: m.data || {},
         salones: this.normalizeSalones(m.salones)
       })) : [];
@@ -135,6 +171,11 @@ export class Materias {
       return;
     }
 
+    if (![1, 2, 3].includes(Number(this.nuevaMateria.grado))) {
+      this.showToast('Selecciona un grado válido', 'warning');
+      return;
+    }
+
     if (this.isNombreDuplicado(this.nuevaMateria.nombre)) {
       this.showToast('Ya existe una materia con ese nombre', 'warning');
       return;
@@ -144,9 +185,16 @@ export class Materias {
       nombre: this.nuevaMateria.nombre,
       grado: this.nuevaMateria.grado || 1,
       horas_semana: this.nuevaMateria.horas_semana || 1,
+      permitir_doble_bloque: Boolean(this.nuevaMateria.permitir_doble_bloque),
       data: this.nuevaMateria.data || {},
-      salones: this.normalizeSalones(this.nuevaMateria.salones)
+      salones: this.selectedSalones
     };
+
+    if (body.salones.length === 0) {
+      this.showToast('Selecciona al menos un salón', 'warning');
+      return;
+    }
+
     try {
       const res = await fetch('http://localhost:3000/materias', {
         method: 'POST',
@@ -160,9 +208,11 @@ export class Materias {
         nombre: data.nombre,
         grado: data.grado,
         horas_semana: data.horas_semana,
+        permitir_doble_bloque: Boolean(data.permitir_doble_bloque),
         salones: this.normalizeSalones(data.salones)
       });
-      this.nuevaMateria = { id: '', nombre: '', grado: 1, horas_semana: 1, data: {}, salones: '' };
+      this.nuevaMateria = { id: '', nombre: '', grado: 1, horas_semana: 1, permitir_doble_bloque: false, data: {}, salones: [] };
+      this.selectedSalones = [];
       this.showToast('Materia creada correctamente', 'success');
     } catch (err) {
       this.showToast('No se pudo crear la materia', 'error');
@@ -172,6 +222,11 @@ export class Materias {
   async guardarEdicion() {
     if (!this.nuevaMateria.nombre.trim() || !this.editandoId) {
       this.showToast('Debes capturar el nombre de la materia', 'warning');
+      return;
+    }
+
+    if (![1, 2, 3].includes(Number(this.nuevaMateria.grado))) {
+      this.showToast('Selecciona un grado válido', 'warning');
       return;
     }
 
@@ -185,8 +240,15 @@ export class Materias {
       grado: this.nuevaMateria.grado || 1,
       data: this.nuevaMateria.data || {},
       horas_semana: this.nuevaMateria.horas_semana || 1,
-      salones: this.normalizeSalones(this.nuevaMateria.salones)
+      permitir_doble_bloque: Boolean(this.nuevaMateria.permitir_doble_bloque),
+      salones: this.selectedSalones
     };
+
+    if (body.salones.length === 0) {
+      this.showToast('Selecciona al menos un salón', 'warning');
+      return;
+    }
+
     try {
       const res = await fetch(`http://localhost:3000/materias/${this.editandoId}`, {
         method: 'PATCH',
@@ -200,10 +262,12 @@ export class Materias {
         nombre: body.nombre,
         grado: body.grado,
         horas_semana: body.horas_semana,
+        permitir_doble_bloque: Boolean(body.permitir_doble_bloque),
         data: body.data,
         salones: this.normalizeSalones(body.salones)
       } : m);
-      this.nuevaMateria = { id: '', nombre: '', grado: 1, horas_semana: 1, data: {}, salones: '' };
+      this.nuevaMateria = { id: '', nombre: '', grado: 1, horas_semana: 1, permitir_doble_bloque: false, data: {}, salones: [] };
+      this.selectedSalones = [];
       this.editandoId = null;
       this.showToast('Materia editada correctamente', 'success');
     } catch (err) {
@@ -212,9 +276,14 @@ export class Materias {
   }
 
   async eliminarMateria(id: string) {
-
-    const confirmacion = confirm('Â¿EstÃ¡s seguro de eliminar esta materia?');
-    if (!confirmacion) return;
+    const confirmed = await this.confirmDialog.confirm({
+      title: 'Eliminar materia',
+      message: '¿Deseas eliminar esta materia? Esta acción no se puede deshacer.',
+      confirmText: 'Sí, eliminar',
+      cancelText: 'Cancelar',
+      tone: 'danger',
+    });
+    if (!confirmed) return;
 
     try {
       const res = await fetch(`http://localhost:3000/materias/${id}`, {
@@ -233,12 +302,14 @@ export class Materias {
     this.editandoId = materia.id;
     this.nuevaMateria = {
       ...materia,
-      salones: this.normalizeSalones(materia.salones)[0] || ''
+      salones: this.normalizeSalones(materia.salones)
     };
+    this.selectedSalones = this.normalizeSalones(materia.salones).slice(0, 2);
   }
 
   cancelarEdicion() {
-    this.nuevaMateria = { id: '', nombre: '', grado: 1, horas_semana: 1, data: {}, salones: '' };
+    this.nuevaMateria = { id: '', nombre: '', grado: 1, horas_semana: 1, permitir_doble_bloque: false, data: {}, salones: [] };
+    this.selectedSalones = [];
     this.editandoId = null;
   }
 }

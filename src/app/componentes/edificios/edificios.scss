@@ -11,7 +11,7 @@ $danger-hover: #c62828;
 
 @use "sass:color";
 
-.materias-container {
+.edificios-container {
 	max-width: 900px;
 	margin: 40px auto;
 	padding: 0 1rem;
@@ -65,7 +65,7 @@ $danger-hover: #c62828;
 		text-align: center;
 	}
 
-	.titulo-materias {
+	.titulo-edificios {
 		color: $primary;
 		font-size: 2rem;
 		font-weight: 700;
@@ -80,13 +80,18 @@ $danger-hover: #c62828;
 	}
 }
 
-.card-form {
+.card-form,
+.card-table {
 	background: $white;
 	border-radius: 16px;
 	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+	border: 1px solid $border;
+	overflow: hidden;
+}
+
+.card-form {
 	padding: 2rem;
 	margin-bottom: 2rem;
-	border: 1px solid $border;
 
 	@media (max-width: 600px) {
 		padding: 1.5rem;
@@ -95,7 +100,7 @@ $danger-hover: #c62828;
 
 .inputs-grid {
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 	gap: 1.5rem;
 	align-items: end;
 }
@@ -112,7 +117,7 @@ $danger-hover: #c62828;
 		margin-left: 2px;
 	}
 
-	.input-materia {
+	.input-edificio {
 		padding: 0.8rem 1rem;
 		border: 1px solid $border;
 		border-radius: 8px;
@@ -132,43 +137,11 @@ $danger-hover: #c62828;
 	}
 }
 
-.check-list {
-	display: grid;
-	gap: 0.4rem;
-	max-height: 145px;
-	overflow: auto;
-	border: 1px solid $border;
-	background: $secondary;
-	padding: 0.6rem;
-	border-radius: 8px;
-}
-
-.check-item {
-	display: flex;
-	align-items: center;
-	gap: 0.5rem;
-	font-size: 0.92rem;
-
-	input[type='checkbox'] {
-		accent-color: $primary;
-	}
-}
-
-.input-group .check-item {
-	margin-top: 0.25rem;
-	padding: 0.75rem 0.85rem;
-	border: 1px solid $border;
-	border-radius: 8px;
-	background: $secondary;
-}
-
-.input-group-wide {
-	grid-column: 1 / -1;
-}
-
 .form-actions {
 	display: flex;
 	gap: 1rem;
+	grid-column: 1 / -1;
+	margin-top: 1rem;
 
 	@media (max-width: 600px) {
 		flex-direction: column;
@@ -213,15 +186,7 @@ $danger-hover: #c62828;
 	}
 }
 
-.card-table {
-	background: $white;
-	border-radius: 16px;
-	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-	border: 1px solid $border;
-	overflow: hidden;
-}
-
-.tabla-materias {
+.tabla-edificios {
 	width: 100%;
 	border-collapse: collapse;
 
@@ -245,6 +210,7 @@ $danger-hover: #c62828;
 		border-bottom: 1px solid $border;
 		color: $text;
 		font-size: 0.95rem;
+		vertical-align: middle;
 	}
 
 	tr:last-child td {
@@ -337,7 +303,7 @@ $danger-hover: #c62828;
 }
 
 @media (max-width: 768px) {
-	.tabla-materias {
+	.tabla-edificios {
 		display: block;
 		overflow-x: auto;
 		-webkit-overflow-scrolling: touch;

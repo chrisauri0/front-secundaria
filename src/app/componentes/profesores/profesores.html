@@ -103,4 +103,6 @@
             </tbody>
         </table>
     </div>
+
+    <div *ngIf="toastVisible" class="app-toast" [ngClass]="toastType">{{ toastMessage }}</div>
 </div>

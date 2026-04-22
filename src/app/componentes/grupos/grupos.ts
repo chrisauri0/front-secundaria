@@ -5,12 +5,15 @@ import { FormsModule, } from '@angular/forms';
 import { ProfesorData } from '../profesores/profesores';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { RouterModule } from '@angular/router';
+import { ConfirmDialogService } from '../shared/confirm-dialog/confirm-dialog.service';
 
 
 export interface Grupo {
   id: string;
   nombre: string;
   grado: number;
+  limite_alumnos: number;
+  alumnosActuales?: number;
   data?: object;
 }
 
@@ -26,6 +29,7 @@ interface Tutor {
 
 @Component({
   selector: 'app-grupos',
+  standalone: true,
   imports: [CommonModule, FormsModule, NgSelectModule, RouterModule],
   templateUrl: './grupos.html',
   styleUrl: './grupos.scss'
@@ -36,12 +40,14 @@ interface Tutor {
 export class GruposComponent {
   grupos: Grupo[] = [];
   grupoEditando: Grupo | null = null;
-  nuevoGrupo: Grupo = { id: '', nombre: '', grado: 1, data: {} };
+  nuevoGrupo: Grupo = { id: '', nombre: '', grado: 1, limite_alumnos: 35, data: {} };
   tutores: Tutor[] = [];
   tutoresOpciones: string[] = [];
   toastVisible = false;
   toastMessage = '';
   toastType: 'success' | 'error' | 'warning' = 'success';
+
+  constructor(private confirmDialog: ConfirmDialogService) {}
   ngOnInit() {
     this.cargarGrupos();
   }
@@ -108,6 +114,8 @@ export class GruposComponent {
           id: g.id,
           nombre: g.nombre,
           grado: g.grado,
+          limite_alumnos: g.limite_alumnos ?? 35,
+          alumnosActuales: g?._count?.alumnos ?? 0,
           data: g.data || {}
         }))
         : [];
@@ -130,8 +138,13 @@ export class GruposComponent {
 
   // Agregar un nuevo grupo
   async agregarGrupo() {
-    if (!this.nuevoGrupo.nombre || !this.nuevoGrupo.grado) {
+    if (!this.nuevoGrupo.nombre || !this.nuevoGrupo.grado || !this.nuevoGrupo.limite_alumnos) {
       this.showToast('Debes completar todos los campos obligatorios', 'warning');
+      return;
+    }
+
+    if (this.nuevoGrupo.limite_alumnos < 1 || this.nuevoGrupo.limite_alumnos > 60) {
+      this.showToast('El límite de alumnos debe estar entre 1 y 60', 'warning');
       return;
     }
 
@@ -142,6 +155,7 @@ export class GruposComponent {
     const body = {
       nombre: this.nuevoGrupo.nombre,
       grado: this.nuevoGrupo.grado,
+      limite_alumnos: this.nuevoGrupo.limite_alumnos,
       data: this.nuevoGrupo.data || {}
     };
     try {
@@ -156,9 +170,11 @@ export class GruposComponent {
         id: data.id || crypto.randomUUID(),
         nombre: data.nombre,
         grado: data.grado,
+        limite_alumnos: data.limite_alumnos ?? this.nuevoGrupo.limite_alumnos,
+        alumnosActuales: data?._count?.alumnos ?? 0,
         data: data.data || {}
       });
-      this.nuevoGrupo = { id: '', nombre: '', grado: 1, data: {} };
+      this.nuevoGrupo = { id: '', nombre: '', grado: 1, limite_alumnos: 35, data: {} };
       this.showToast('Grupo creado correctamente', 'success');
     } catch (err) {
       this.showToast('No se pudo crear el grupo', 'error');
@@ -173,11 +189,17 @@ export class GruposComponent {
 
   // Guardar los cambios de un grupo editado
   async guardarEdicion() {
-    if (!this.nuevoGrupo.nombre || !this.nuevoGrupo.grado) {
+    if (!this.nuevoGrupo.nombre || !this.nuevoGrupo.grado || !this.nuevoGrupo.limite_alumnos) {
       this.showToast('Debes completar todos los campos obligatorios', 'warning');
       return;
     }
+
     if (!this.grupoEditando) return;
+
+    if (this.nuevoGrupo.limite_alumnos < (this.grupoEditando.alumnosActuales ?? 0)) {
+      this.showToast('El límite no puede ser menor a los alumnos ya asignados', 'warning');
+      return;
+    }
 
     if (this.isNombreDuplicado(this.nuevoGrupo.nombre, this.grupoEditando.id)) {
       this.showToast('Ya existe un grupo con ese nombre', 'warning');
@@ -187,6 +209,7 @@ export class GruposComponent {
     const body = {
       nombre: this.nuevoGrupo.nombre,
       grado: this.nuevoGrupo.grado,
+      limite_alumnos: this.nuevoGrupo.limite_alumnos,
       data: this.nuevoGrupo.data || {}
     };
     try {
@@ -203,11 +226,13 @@ export class GruposComponent {
           id: this.grupoEditando.id,
           nombre: body.nombre,
           grado: body.grado,
+          limite_alumnos: body.limite_alumnos,
+          alumnosActuales: this.grupos[index].alumnosActuales,
           data: body.data
         };
       }
       this.grupoEditando = null;
-      this.nuevoGrupo = { id: '', nombre: '', grado: 1, data: {} };
+      this.nuevoGrupo = { id: '', nombre: '', grado: 1, limite_alumnos: 35, data: {} };
       this.showToast('Grupo editado correctamente', 'success');
     } catch (err) {
       this.showToast('No se pudo editar el grupo', 'error');
@@ -217,13 +242,19 @@ export class GruposComponent {
   // Cancelar ediciÃ³n
   cancelarEdicion(): void {
     this.grupoEditando = null;
-    this.nuevoGrupo = { id: '', nombre: '', grado: 1, data: {} };
+    this.nuevoGrupo = { id: '', nombre: '', grado: 1, limite_alumnos: 35, data: {} };
   }
 
   // Eliminar un grupo
   async eliminarGrupo(id: string) {
-    const confirmacion = confirm('¿Estás seguro de eliminar este grupo?');
-    if (!confirmacion) return;
+    const confirmed = await this.confirmDialog.confirm({
+      title: 'Eliminar grupo',
+      message: '¿Deseas eliminar este grupo? Esta acción no se puede deshacer.',
+      confirmText: 'Sí, eliminar',
+      cancelText: 'Cancelar',
+      tone: 'danger',
+    });
+    if (!confirmed) return;
 
     try {
       const res = await fetch(`http://localhost:3000/grupos/${id}`, {

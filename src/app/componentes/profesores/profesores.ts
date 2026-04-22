@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { Materia } from '../materias/materias';
 import { RouterModule } from '@angular/router';
+import { ConfirmDialogService } from '../shared/confirm-dialog/confirm-dialog.service';
 
 export interface ProfesorData {
   profesor_id: string;
@@ -28,6 +29,9 @@ export class ProfesoresComponent {
   profesores: ProfesorData[] = [];
   materias: Materia[] = [];
   materiasOpciones: string[] = [];
+  toastVisible = false;
+  toastMessage = '';
+  toastType: 'success' | 'error' | 'warning' = 'success';
   nuevoProfesor: ProfesorData = {
     profesor_id: '',
     nombre: '',
@@ -38,6 +42,8 @@ export class ProfesoresComponent {
     metadata: {}
   };
   editandoId: string | null = null;
+
+  constructor(private confirmDialog: ConfirmDialogService) {}
 
   ngOnInit() {
     this.cargarProfesores();
@@ -55,6 +61,15 @@ export class ProfesoresComponent {
     return headers;
   }
 
+  private showToast(message: string, type: 'success' | 'error' | 'warning' = 'success') {
+    this.toastMessage = message;
+    this.toastType = type;
+    this.toastVisible = true;
+    setTimeout(() => {
+      this.toastVisible = false;
+    }, 2600);
+  }
+
 
   async cargarMaterias() {
     const localKey = 'materias-cache';
@@ -69,7 +84,9 @@ export class ProfesoresComponent {
         this.materias = materiasLocal;
         this.materiasOpciones = materiasLocal.map(m => m.nombre);
         console.log('Cargado desde cache localStorage');
-      } catch { }
+      } catch {
+        // cache roto, se ignora
+      }
     }
 
     // Siempre consulta el backend para obtener el hash actual
@@ -100,7 +117,7 @@ export class ProfesoresComponent {
       localStorage.setItem(localKey, JSON.stringify(this.materias));
       localStorage.setItem(localHashKey, hash);
     } catch (err) {
-      alert('No se pudo cargar la lista de materias: ' + err);
+      this.showToast('No se pudo cargar la lista de materias', 'error');
     }
   }
 
@@ -187,7 +204,7 @@ export class ProfesoresComponent {
       JSON.stringify(p.metadata) === JSON.stringify(this.nuevoProfesor.metadata)
     );
     if (existe) {
-      alert('No hay cambios en los datos del profesor. No se enviarÃ¡ la peticiÃ³n.');
+      this.showToast('Ya existe un profesor con esos datos', 'warning');
       return;
     }
 
@@ -197,8 +214,10 @@ export class ProfesoresComponent {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
       });
-      if (!res.ok) throw new Error('Error al crear el profesor');
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || data?.error) {
+        throw new Error(data?.error || 'Error al crear el profesor');
+      }
       // Usar el id real devuelto por el backend
       this.profesores.push({
         ...this.nuevoProfesor,
@@ -215,8 +234,9 @@ export class ProfesoresComponent {
         materias: [],
         metadata: {}
       };
+      this.showToast('Profesor creado correctamente', 'success');
     } catch (err) {
-      alert('No se pudo crear el profesor: ' + err);
+      this.showToast(String(err).replace(/^Error:\s*/, ''), 'error');
     }
   }
 
@@ -238,8 +258,8 @@ export class ProfesoresComponent {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
       });
-      if (!res.ok) throw new Error('Error al actualizar el profesor');
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || data?.error) throw new Error(data?.error || 'Error al actualizar el profesor');
       // Mantener el id al actualizar localmente
       this.profesores = this.profesores.map(p =>
         p.profesor_id === this.editandoId ? { ...p, ...body, profesor_id: p.profesor_id } : p
@@ -256,22 +276,30 @@ export class ProfesoresComponent {
       this.editandoId = null;
       //recagar la lista de profesores para asegurar consistencia
       this.cargarProfesores();
+      this.showToast('Profesor editado correctamente', 'success');
     } catch (err) {
-      alert('No se pudo actualizar el profesor: ' + err);
+      this.showToast(String(err).replace(/^Error:\s*/, ''), 'error');
     }
   }
 
   async eliminarProfesor(profesor_id: string) {
-    const confirmacion = confirm('Â¿EstÃ¡s seguro de que deseas eliminar este profesor?');
-    if (!confirmacion) return;
+    const confirmed = await this.confirmDialog.confirm({
+      title: 'Eliminar profesor',
+      message: '¿Deseas eliminar este profesor? Esta acción no se puede deshacer.',
+      confirmText: 'Sí, eliminar',
+      cancelText: 'Cancelar',
+      tone: 'danger',
+    });
+    if (!confirmed) return;
     try {
       const res = await fetch(`http://localhost:3000/profesores/${profesor_id}`, {
         method: 'DELETE'
       });
       if (!res.ok) throw new Error('Error al eliminar el profesor');
       this.profesores = this.profesores.filter(p => p.profesor_id !== profesor_id);
+      this.showToast('Profesor eliminado correctamente', 'success');
     } catch (err) {
-      alert('No se pudo eliminar el profesor: ' + err);
+      this.showToast('No se pudo eliminar el profesor', 'error');
       console.log(profesor_id);
     }
   }

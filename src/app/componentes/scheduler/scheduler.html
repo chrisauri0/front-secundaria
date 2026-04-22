@@ -28,25 +28,147 @@
     </div>
 
     <div class="controls-card">
-        <div class="actions-wrapper">
+        <div class="filter-grid">
             <div class="input-group">
-                <label for="gradoScheduler">Grado (opcional)</label>
-                <input id="gradoScheduler" type="number" min="1" [(ngModel)]="selectedGrado" name="selectedGrado"
-                    placeholder="Ej. 1" class="input-grupo" />
+                <label for="gradoScheduler">Grado</label>
+                <select id="gradoScheduler" [(ngModel)]="gradoFiltro" (ngModelChange)="onChangeGradoFiltro()"
+                    name="gradoFiltro" class="input-filter">
+                    <option value="all">Todos los grados</option>
+                    <option value="1">1° de secundaria</option>
+                    <option value="2">2° de secundaria</option>
+                    <option value="3">3° de secundaria</option>
+                </select>
             </div>
+
+            <div class="input-group inline-toggle">
+                <label class="checkbox-item">
+                    <input type="checkbox" [(ngModel)]="generarTodo" name="generarTodo" />
+                    <span>Generar TODO (ignorar filtros)</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="selectors-grid" [class.disabled]="generarTodo">
+            <div class="selector-card">
+                <div class="selector-head">
+                    <h4>Materias</h4>
+                    <label class="checkbox-item">
+                        <input type="checkbox" [checked]="sonTodasMateriasSeleccionadas()"
+                            (change)="onToggleTodasMaterias($any($event.target).checked)" [disabled]="generarTodo" />
+                        <span>Seleccionar todas</span>
+                    </label>
+                </div>
+                <div class="check-list">
+                    @for (materia of materiasFiltradas; track materia.id) {
+                    <label class="checkbox-item">
+                        <input type="checkbox" [checked]="materiasSeleccionadas.includes(materia.nombre)"
+                            (change)="onToggleMateria(materia.nombre, $any($event.target).checked)" [disabled]="generarTodo" />
+                        <span>{{ getMateriaLabel(materia) }}</span>
+                    </label>
+                    }
+                    @if (materiasFiltradas.length === 0) {
+                    <p class="empty-list">No hay materias para este filtro.</p>
+                    }
+                </div>
+            </div>
+
+            <div class="selector-card">
+                <div class="selector-head">
+                    <h4>Grupos</h4>
+                    <label class="checkbox-item">
+                        <input type="checkbox" [checked]="sonTodosGruposSeleccionados()"
+                            (change)="onToggleTodosGrupos($any($event.target).checked)" [disabled]="generarTodo" />
+                        <span>Seleccionar todos</span>
+                    </label>
+                </div>
+                <div class="check-list">
+                    @for (grupo of gruposFiltrados; track grupo.id) {
+                    <label class="checkbox-item">
+                        <input type="checkbox" [checked]="gruposSeleccionados.includes(grupo.nombre)"
+                            (change)="onToggleGrupo(grupo.nombre, $any($event.target).checked)" [disabled]="generarTodo" />
+                        <span>{{ getGrupoLabel(grupo) }}</span>
+                    </label>
+                    }
+                    @if (gruposFiltrados.length === 0) {
+                    <p class="empty-list">No hay grupos para este filtro.</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="form-actions">
             <button (click)="generateSchedule()" [disabled]="loading" class="btn-generate" [class.loading]="loading">
-                <span *ngIf="!loading">Generar Horarios</span>
-                <span *ngIf="loading">Generando...</span>
-                <div *ngIf="loading" class="spinner-mini"></div>
+                @if (!loading) {
+                <span>Generar Horarios</span>
+                } @else {
+                <span>Generando...</span>
+                <div class="spinner-mini"></div>
+                }
             </button>
         </div>
 
-        <div *ngIf="message" class="status-message" [ngClass]="{ 'success': isSuccess, 'error': !isSuccess }">
-            {{ message }}
+        @if (message) {
+        <div class="status-message" [ngClass]="{ 'success': isSuccess, 'error': !isSuccess }">
+            <p class="status-main">{{ message }}</p>
+
+            @if (!isSuccess && warningMissingByGroup.length > 0) {
+            <div class="missing-summary">
+                <p class="missing-title">Materias con horas faltantes por grupo</p>
+                @for (group of warningMissingByGroup; track group.group) {
+                <div class="missing-group">
+                    <span class="missing-group-name">{{ group.group }}</span>
+                    <div class="missing-chips">
+                        @for (item of group.items; track item) {
+                        <span class="missing-chip">{{ item }}</span>
+                        }
+                    </div>
+                </div>
+                }
+                <p class="missing-tip">Tip: usa el botón <strong>Mover</strong> en cada bloque para redistribuir clases manualmente sin romper conflictos.</p>
+            </div>
+            }
         </div>
+        }
+
+        @if (moveEditor) {
+        <div class="move-editor-card">
+            <h4>Mover clase manualmente</h4>
+            <p>
+                Grupo <strong>{{ moveEditor.groupName }}</strong> · {{ moveEditor.clase.subj }} ·
+                {{ moveEditor.clase.prof }} · {{ moveEditor.clase.room }}
+            </p>
+            <div class="move-editor-grid">
+                <div class="input-group">
+                    <label for="moveDay">Día destino</label>
+                    <select id="moveDay" [(ngModel)]="moveEditor.toDay" name="moveDay" class="input-filter">
+                        <option value="Lun">Lunes</option>
+                        <option value="Mar">Martes</option>
+                        <option value="Mie">Miércoles</option>
+                        <option value="Jue">Jueves</option>
+                        <option value="Vie">Viernes</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="moveHour">Bloque destino</label>
+                    <select id="moveHour" [(ngModel)]="moveEditor.toHour" name="moveHour" class="input-filter">
+                        @for (hora of horas; track hora) {
+                        <option [value]="hora">{{ bloquesLabel[hora] }}</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="move-actions">
+                <button type="button" class="btn-cancel-move" (click)="closeMoveEditor()" [disabled]="moving">Cancelar</button>
+                <button type="button" class="btn-apply-move" (click)="applyManualMove()" [disabled]="moving">
+                    {{ moving ? 'Moviendo...' : 'Aplicar movimiento' }}
+                </button>
+            </div>
+        </div>
+        }
     </div>
 
-    <div class="results-section" *ngIf="groupedSchedules.length || profesoresConHorarios.length">
+    @if (groupedSchedules.length || profesoresConHorarios.length) {
+    <div class="results-section">
         <div class="view-toggles">
             <button type="button" class="toggle-btn" [class.active]="vistaHorarios === 'grupo'"
                 (click)="vistaHorarios = 'grupo'">
@@ -71,8 +193,10 @@
         </div>
 
         <!-- Vista por Grupos -->
-        <div *ngIf="vistaHorarios === 'grupo'" class="schedules-grid">
-            <div *ngFor="let group of groupedSchedules" class="schedule-card">
+        @if (vistaHorarios === 'grupo') {
+        <div class="schedules-grid">
+            @for (group of groupedSchedules; track group.nombregrupo) {
+            <div class="schedule-card">
                 <div class="card-header">
                     <h4 class="group-title">{{ group.nombregrupo }} <span class="badge-count">{{ group.data.length }}
                             clases</span></h4>
@@ -93,29 +217,52 @@
                         <thead>
                             <tr>
                                 <th class="th-hora">Hora</th>
-                                <th *ngFor="let dia of diasSemana">{{ dia }}</th>
+                                @for (dia of diasSemana; track dia) {
+                                <th>{{ dia }}</th>
+                                }
                             </tr>
                         </thead>
                         <tbody>
-                            <tr *ngFor="let hora of horas">
-                                <td class="hora-cell">{{ hora }}:00</td>
-                                <td *ngFor="let dia of diasSemana">
-                                    <div *ngIf="getClase(group.data, dia, hora) as clase" class="clase-item">
+                            @for (hora of horas; track hora) {
+                            <tr>
+                                <td class="hora-cell">{{ bloquesLabel[hora] || hora }}</td>
+                                @for (dia of diasSemana; track dia) {
+                                <td>
+                                    @if (getClase(group.data, dia, hora); as clase) {
+                                    <div class="clase-item">
                                         <div class="materia">{{ clase.subj }}</div>
                                         <div class="profesor">{{ clase.prof }}</div>
                                         <div class="salon">{{ clase.room }}</div>
+                                        <button class="btn-move" type="button" (click)="openMoveEditor(group.nombregrupo, clase)">
+                                            Mover
+                                        </button>
                                     </div>
+                                    }
+                                </td>
+                                }
+                            </tr>
+                            @if (hasRecesoAfter(hora)) {
+                            <tr class="receso-row">
+                                <td class="hora-cell receso-time">09:30-09:50</td>
+                                <td class="receso-merged" [attr.colspan]="diasSemana.length">
+                                    <div class="receso-pill">RECESO</div>
                                 </td>
                             </tr>
+                            }
+                            }
                         </tbody>
                     </table>
                 </div>
             </div>
+            }
         </div>
+        }
 
         <!-- Vista por Profesores -->
-        <div *ngIf="vistaHorarios === 'profesor'" class="schedules-grid">
-            <div *ngFor="let prof of profesoresConHorarios" class="schedule-card">
+        @if (vistaHorarios === 'profesor') {
+        <div class="schedules-grid">
+            @for (prof of profesoresConHorarios; track prof.nombre) {
+            <div class="schedule-card">
                 <div class="card-header">
                     <h4 class="group-title">{{ prof.nombre }} <span class="badge-count">{{ prof.clases.length }}
                             clases</span></h4>
@@ -136,24 +283,47 @@
                         <thead>
                             <tr>
                                 <th class="th-hora">Hora</th>
-                                <th *ngFor="let dia of diasSemana">{{ dia }}</th>
+                                @for (dia of diasSemana; track dia) {
+                                <th>{{ dia }}</th>
+                                }
                             </tr>
                         </thead>
                         <tbody>
-                            <tr *ngFor="let hora of horas">
-                                <td class="hora-cell">{{ hora }}:00</td>
-                                <td *ngFor="let dia of diasSemana">
-                                    <div *ngIf="getClaseProfesor(prof.clases, dia, hora) as clase" class="clase-item">
-                                        <div class="materia">{{ clase.subj }}</div>
-                                        <div class="grupo-badge">{{ clase.group || clase.grupo || '-' }}</div>
-                                        <div class="salon">{{ clase.room }}</div>
+                            @for (hora of horas; track hora) {
+                            <tr>
+                                <td class="hora-cell">{{ bloquesLabel[hora] || hora }}</td>
+                                @for (dia of diasSemana; track dia) {
+                                <td>
+                                    @if (getClasesProfesor(prof.clases, dia, hora).length > 0) {
+                                    <div class="clase-item">
+                                        @for (clase of getClasesProfesor(prof.clases, dia, hora); track clase.start + '-' + (clase.group || clase.grupo || '') + '-' + clase.subj) {
+                                        <div class="prof-class-entry">
+                                            <div class="materia">{{ clase.subj }}</div>
+                                            <div class="grupo-badge">{{ clase.group || clase.grupo || '-' }}</div>
+                                            <div class="salon">{{ clase.room }}</div>
+                                        </div>
+                                        }
                                     </div>
+                                    }
+                                </td>
+                                }
+                            </tr>
+                            @if (hasRecesoAfter(hora)) {
+                            <tr class="receso-row">
+                                <td class="hora-cell receso-time">09:30-09:50</td>
+                                <td class="receso-merged" [attr.colspan]="diasSemana.length">
+                                    <div class="receso-pill">RECESO</div>
                                 </td>
                             </tr>
+                            }
+                            }
                         </tbody>
                     </table>
                 </div>
             </div>
+            }
         </div>
+        }
     </div>
+    }
 </div>

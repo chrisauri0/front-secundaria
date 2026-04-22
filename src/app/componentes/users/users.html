@@ -1,0 +1,42 @@
+<div class="crud-container">
+  <div class="header-row">
+    <a routerLink="/dashboard" class="btn-back">Volver</a>
+    <h2>Usuarios</h2>
+  </div>
+
+  <form (ngSubmit)="guardar()" class="crud-form">
+    <input [(ngModel)]="nuevo.email" name="email" type="email" placeholder="Email" required />
+    <input [(ngModel)]="nuevo.fullName" name="fullName" placeholder="Nombre completo" />
+    <input *ngIf="!editandoId" [(ngModel)]="nuevo.passwordHash" name="passwordHash" type="password" placeholder="Contraseña" required />
+    <select [(ngModel)]="nuevo.role" name="role">
+      <option value="user">user</option>
+      <option value="administrador">administrador</option>
+    </select>
+    <button type="submit">{{ editandoId ? 'Guardar cambios' : 'Agregar usuario' }}</button>
+    <button type="button" *ngIf="editandoId" (click)="cancelar()">Cancelar</button>
+  </form>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Email</th>
+        <th>Nombre</th>
+        <th>Rol</th>
+        <th>Activo</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let user of users">
+        <td>{{ user.email }}</td>
+        <td>{{ user.full_name || '-' }}</td>
+        <td>{{ user.role || '-' }}</td>
+        <td>{{ user.activo ? 'Sí' : 'No' }}</td>
+        <td>
+          <button (click)="editar(user)">Editar</button>
+          <button (click)="eliminar(user.id)">Eliminar</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

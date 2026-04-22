@@ -10,7 +10,9 @@ import { Materias } from './componentes/materias/materias';
 import { GruposComponent } from './componentes/grupos/grupos';
 import { SchedulerComponent } from './componentes/scheduler/scheduler';
 import { VerHorarios } from './componentes/scheduler/ver-horarios/ver-horarios';
-import { Psicologos } from './componentes/psicologos/psicologos';
+import { EdificiosComponent } from './componentes/edificios/edificios';
+import { AlumnosComponent } from './componentes/alumnos/alumnos';
+import { UsersComponent } from './componentes/users/users';
 
 
 export const routes: Routes = [
@@ -18,10 +20,12 @@ export const routes: Routes = [
   {  path: 'login', component: BienvenidaComponent, title: 'Iniciar Sesión' },
   { path: 'dashboard', component: DashboardComponent , title: 'Dashboard'},
   { path: 'salones', component: SalonesComponent , title: 'Salones'},
+  { path: 'edificios', component: EdificiosComponent , title: 'Edificios'},
   { path: 'profesores', component: ProfesoresComponent , title: 'Profesores'},
+  { path: 'users', component: UsersComponent , title: 'Usuarios'},
   { path: 'materias', component: Materias , title: 'Materias'},
   { path: 'grupos', component: GruposComponent , title: 'Grupos'},
-  {path: 'psicologos', component: Psicologos , title: 'Psicólogos'},
+  { path: 'alumnos', component: AlumnosComponent , title: 'Alumnos'},
   {
     path: 'horarios',
     children: [

@@ -37,7 +37,8 @@ salones: salonesData[] = [];
       const data = await res.json();
       this.salones = Array.isArray(data) ? data.map((s, idx) => ({
         id: s.id || idx,
-        nombre: s.nombre
+        nombre: s.nombre,
+        edificio_id: s.edificio_id || ''
         
       })) : [];
     } catch (err) {

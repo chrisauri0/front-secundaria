@@ -11,19 +11,15 @@ $danger-hover: #c62828;
 
 @use "sass:color";
 
-.carreras-container {
-	max-width: 900px;
+.alumnos-container {
+	max-width: 1200px;
 	margin: 40px auto;
 	padding: 0 1rem;
 	font-family: 'Segoe UI', 'Roboto', Helvetica, Arial, sans-serif;
 	color: $text;
-	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-	padding: 2rem;
-	margin-bottom: 2rem;
-	border: 1px solid $border;
 
 	@media (max-width: 600px) {
-		padding: 1.5rem;
+		padding: 0 0.75rem;
 	}
 }
 
@@ -32,7 +28,7 @@ $danger-hover: #c62828;
 	align-items: center;
 	justify-content: center;
 	position: relative;
-	margin-bottom: 2.5rem;
+	margin-bottom: 2rem;
 
 	.btn-back {
 		position: absolute;
@@ -65,7 +61,7 @@ $danger-hover: #c62828;
 		text-align: center;
 	}
 
-	.titulo-grupos {
+	.titulo-alumnos {
 		color: $primary;
 		font-size: 2rem;
 		font-weight: 700;
@@ -80,13 +76,18 @@ $danger-hover: #c62828;
 	}
 }
 
-.card-form {
+.card-form,
+.card-table {
 	background: $white;
 	border-radius: 16px;
 	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+	border: 1px solid $border;
+	overflow: hidden;
+}
+
+.card-form {
 	padding: 2rem;
 	margin-bottom: 2rem;
-	border: 1px solid $border;
 
 	@media (max-width: 600px) {
 		padding: 1.5rem;
@@ -95,8 +96,8 @@ $danger-hover: #c62828;
 
 .inputs-grid {
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-	gap: 1.5rem;
+	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+	gap: 1.25rem;
 	align-items: end;
 }
 
@@ -105,6 +106,10 @@ $danger-hover: #c62828;
 	flex-direction: column;
 	gap: 0.5rem;
 
+	&.input-group-wide {
+		grid-column: 1 / -1;
+	}
+
 	label {
 		font-size: 0.9rem;
 		font-weight: 600;
@@ -112,7 +117,7 @@ $danger-hover: #c62828;
 		margin-left: 2px;
 	}
 
-	.input-carrera {
+	.input-alumno {
 		padding: 0.8rem 1rem;
 		border: 1px solid $border;
 		border-radius: 8px;
@@ -120,18 +125,14 @@ $danger-hover: #c62828;
 		background: $secondary;
 		transition: all 0.2s ease;
 		color: $text;
+		width: 100%;
+		box-sizing: border-box;
 
 		&:focus {
 			outline: none;
 			border-color: $primary;
 			background: $white;
 			box-shadow: 0 0 0 3px rgba($primary, 0.1);
-		}
-
-		&:disabled {
-			background: color.adjust($secondary, $lightness: -2%);
-			color: color.adjust($text, $lightness: 40%);
-			cursor: not-allowed;
 		}
 	}
 }
@@ -140,7 +141,7 @@ $danger-hover: #c62828;
 	display: flex;
 	gap: 1rem;
 	grid-column: 1 / -1;
-	margin-top: 1rem;
+	margin-top: 0.25rem;
 
 	@media (max-width: 600px) {
 		flex-direction: column;
@@ -185,21 +186,13 @@ $danger-hover: #c62828;
 	}
 }
 
-.card-table {
-	background: $white;
-	border-radius: 16px;
-	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-	border: 1px solid $border;
-	overflow: hidden;
-}
-
-.tabla-carreras {
+.tabla-alumnos {
 	width: 100%;
 	border-collapse: collapse;
 
 	th,
 	td {
-		padding: 1.2rem 1.5rem;
+		padding: 1.2rem 1.25rem;
 		text-align: left;
 	}
 
@@ -217,6 +210,7 @@ $danger-hover: #c62828;
 		border-bottom: 1px solid $border;
 		color: $text;
 		font-size: 0.95rem;
+		vertical-align: middle;
 	}
 
 	tr:last-child td {
@@ -251,7 +245,9 @@ $danger-hover: #c62828;
 
 	.empty-state {
 		text-align: center;
-		-webkit-overflow-scrolling: touch;
+		padding: 3rem;
+		color: color.adjust($text, $lightness: 30%);
+		font-style: italic;
 	}
 }
 
@@ -279,5 +275,37 @@ $danger-hover: #c62828;
 	&.btn-eliminar:hover {
 		color: $danger;
 		background: color.adjust($danger, $alpha: -0.9);
+	}
+}
+
+.app-toast {
+	position: fixed;
+	right: 24px;
+	bottom: 24px;
+	padding: 0.8rem 1rem;
+	border-radius: 10px;
+	color: #fff;
+	font-weight: 600;
+	box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+	z-index: 9999;
+
+	&.success {
+		background: #1f8f4a;
+	}
+
+	&.error {
+		background: #c62828;
+	}
+
+	&.warning {
+		background: #d97706;
+	}
+}
+
+@media (max-width: 768px) {
+	.tabla-alumnos {
+		display: block;
+		overflow-x: auto;
+		-webkit-overflow-scrolling: touch;
 	}
 }

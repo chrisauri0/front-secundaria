@@ -2,6 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component, signal, OnInit } from '@angular/core';
 import { Router, RouterLink, RouterOutlet, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import { ConfirmDialogComponent } from './componentes/shared/confirm-dialog/confirm-dialog.component';
+import { ConfirmDialogService } from './componentes/shared/confirm-dialog/confirm-dialog.service';
 
 /**
  * Componente principal de la aplicación.
@@ -12,7 +14,7 @@ import { filter } from 'rxjs/operators';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, CommonModule, RouterLink],
+  imports: [RouterOutlet, CommonModule, RouterLink, ConfirmDialogComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
@@ -22,8 +24,6 @@ export class App implements OnInit {
 
   /** Nombre del usuario autenticado */
   usuarioNombre: string = '';
-  /** Carrera del usuario autenticado */
-  usuarioCarrera: string = '';
   /** Estado del sidebar */
   sidebarCollapsed = false;
   /** Indica si se está en la pantalla de login */
@@ -31,7 +31,10 @@ export class App implements OnInit {
   /** Estado del menú superior responsive */
   navbarOpen = false;
 
-  constructor(private router: Router) {
+  constructor(
+    private router: Router,
+    private confirmDialog: ConfirmDialogService,
+  ) {
     // Detecta si la ruta actual es /login o la raíz para ocultar el layout
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
@@ -51,15 +54,12 @@ export class App implements OnInit {
         // Validación y parseo seguro
         const parsed = JSON.parse(usuarioData);
         this.usuarioNombre = typeof parsed.nombre === 'string' ? parsed.nombre : 'Usuario';
-        this.usuarioCarrera = typeof parsed.carrera === 'string' ? parsed.carrera : 'N/A';
       } else {
         this.usuarioNombre = 'Coordinación Académica';
-        this.usuarioCarrera = 'N/A';
       }
     } catch (error) {
       // Manejo de error de parseo
       this.usuarioNombre = 'Usuario';
-      this.usuarioCarrera = 'N/A';
       // Se podría loggear el error si se cuenta con un sistema de logs
     }
   }
@@ -68,10 +68,17 @@ export class App implements OnInit {
    * Cierra la sesión del usuario, eliminando datos y redirigiendo a login.
    * Incluye confirmación para evitar cierres accidentales.
    */
-  cerrarSesion(): void {
-    if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
-      localStorage.removeItem('userData');
-      this.router.navigate(['/login']);
-    }
+  async cerrarSesion(): Promise<void> {
+    const confirmed = await this.confirmDialog.confirm({
+      title: 'Cerrar sesión',
+      message: '¿Seguro que deseas cerrar sesión ahora?',
+      confirmText: 'Sí, cerrar sesión',
+      cancelText: 'Cancelar',
+      tone: 'danger',
+    });
+
+    if (!confirmed) return;
+    localStorage.removeItem('userData');
+    this.router.navigate(['/login']);
   }
 }

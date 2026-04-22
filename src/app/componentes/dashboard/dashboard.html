@@ -18,26 +18,30 @@
         <h2>¿Cómo empezar?</h2>
         <ol class="steps-list">
             <li>
+                <a routerLink="/edificios" class="step-link">Edificios:</a> Registra los edificios del plantel.
+            </li>
+            <li>
                 <a routerLink="/salones" class="step-link">Gestión de Salones:</a> Añade todos los salones disponibles
-                en la institución.
+                y asigna su edificio.
             </li>
             <li>
-                <a routerLink="/materias" class="step-link">Gestión de Materias:</a> Agrega todas las materias que
-                deseas incluir en el horario.
+                <a routerLink="/grupos" class="step-link">Gestión de Grupos:</a> Crea grupos y define su límite de alumnos.
             </li>
             <li>
-                <a routerLink="/profesores" class="step-link">Profesores:</a> Asigna correctamente los profesores a las
-                materias correspondientes.
+                <a routerLink="/alumnos" class="step-link">Alumnos:</a> Registra alumnos y asígnalos manualmente al grupo.
             </li>
             <li>
-                <a routerLink="/grupos" class="step-link">Gestión de Grupos:</a> Crea los grupos correspondientes.
+                <a routerLink="/materias" class="step-link">Materias por salón:</a> Captura materias y salones permitidos para cada una.
             </li>
             <li>
-                <a routerLink="/horarios/nuevo" class="step-link">Generar Horarios:</a> Selecciona los
-                grados y haz clic en <b>Generar Horario</b> para crear el horario automáticamente.
+                <a routerLink="/profesores" class="step-link">Profesores y disponibilidad:</a> Relaciona materias y horarios docentes.
             </li>
             <li>
-                <span class="step-highlight">Visualizar:</span> Visualiza o exporta los horarios generados en PDF.
+                <a routerLink="/horarios/nuevo" class="step-link">Generar Horarios:</a> Genera horarios en bloques de 6 horas
+                con receso de 20 minutos (09:30-09:50).
+            </li>
+            <li>
+                <span class="step-highlight">Visualizar y exportar:</span> Consulta horarios por grupo/profesor y exporta PDF.
             </li>
         </ol>
     </div>

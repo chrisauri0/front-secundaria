@@ -22,8 +22,15 @@
                 </div>
                 <div class="input-group">
                     <label for="edificioSalon">Edificio</label>
-                    <input id="edificioSalon" type="text" placeholder="Ej. Edificio A" [(ngModel)]="nuevoSalon.edificio"
-                        name="edificio" class="input-salon" />
+                    <select id="edificioSalon" [(ngModel)]="nuevoSalon.edificio_id" name="edificio_id" class="input-salon" required>
+                        <option value="" disabled>Selecciona un edificio</option>
+                        <option *ngFor="let edificio of edificios" [value]="edificio.id">{{ edificio.nombre }}</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="capacidadSalon">Capacidad</label>
+                    <input id="capacidadSalon" type="number" placeholder="Ej. 35" [(ngModel)]="nuevoSalon.capacidad"
+                        name="capacidad" min="1" max="80" class="input-salon" />
                 </div>
                 <div class="form-actions">
                     <button type="submit" class="btn-guardar">
@@ -44,6 +51,7 @@
                     <th class="th-id">#</th>
                     <th>Nombre</th>
                     <th>Edificio</th>
+                    <th>Capacidad</th>
                     <th class="th-actions">Acciones</th>
                 </tr>
             </thead>
@@ -51,7 +59,8 @@
                 <tr *ngFor="let salon of salones; let i = index">
                     <td class="td-id">{{ i + 1 }}</td>
                     <td class="td-nombre">{{ salon.nombre }}</td>
-                    <td>{{ salon.edificio || 'Sin edificio' }}</td>
+                    <td>{{ salon.edificioNombre || 'Sin edificio' }}</td>
+                    <td>{{ salon.capacidad || 35 }}</td>
                     <td class="td-actions">
                         <button class="btn-icon btn-editar" (click)="editarSalon(salon)" title="Editar">
                             <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -68,7 +77,7 @@
                     </td>
                 </tr>
                 <tr *ngIf="salones.length === 0">
-                    <td colspan="4" class="empty-state">
+                    <td colspan="5" class="empty-state">
                         No hay salones registrados. ¡Agrega uno nuevo arriba!
                     </td>
                 </tr>

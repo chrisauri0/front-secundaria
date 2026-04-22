@@ -2,10 +2,13 @@
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { ConfirmDialogService } from '../shared/confirm-dialog/confirm-dialog.service';
 export interface salonesData {
   id: string;
   nombre: string;
-  edificio?: string;
+  edificio_id: string;
+  edificioNombre?: string;
+  capacidad?: number;
 }
 
 @Component({
@@ -16,30 +19,47 @@ export interface salonesData {
 })
 export class SalonesComponent {
   usuarioNombre: string = '';
-  usuarioCarrera: string = '';
   sidebarCollapsed = false;
 
 
   salones: salonesData[] = [];
-  nuevoSalon: salonesData = { id: '', nombre: '', edificio: '' };
+  edificios: Array<{ id: string; nombre: string }> = [];
+  nuevoSalon: salonesData = { id: '', nombre: '', edificio_id: '', capacidad: 35 };
   editandoId: string | null = null;
   toastVisible = false;
   toastMessage = '';
   toastType: 'success' | 'error' | 'warning' = 'success';
 
+  constructor(private confirmDialog: ConfirmDialogService) {}
+
   ngOnInit() {
     const usuarioData = localStorage.getItem('userData');
     if (usuarioData) {
-      const { full_name, metadata: { division, turno } } = JSON.parse(usuarioData);
+      const { full_name } = JSON.parse(usuarioData);
       this.usuarioNombre = full_name || 'Usuario';
-      this.usuarioCarrera = `${division || ''} - ${turno || ''}`;
 
     } else {
       this.usuarioNombre = 'Usuario';
-      this.usuarioCarrera = '';
     }
+    this.cargarEdificios();
     this.cargarSalones();
   }
+  async cargarEdificios() {
+    try {
+      const res = await fetch('http://localhost:3000/edificios', {
+        headers: this.getAuthHeaders()
+      });
+      if (!res.ok) throw new Error('Error al obtener edificios');
+      const data = await res.json();
+      this.edificios = Array.isArray(data) ? data.map((e: any) => ({ id: e.id, nombre: e.nombre })) : [];
+      if (!this.nuevoSalon.edificio_id && this.edificios.length > 0) {
+        this.nuevoSalon.edificio_id = this.edificios[0].id;
+      }
+    } catch {
+      this.showToast('No se pudo cargar la lista de edificios', 'error');
+    }
+  }
+
 
   private getAuthHeaders(includeContentType = false): HeadersInit {
     const token = localStorage.getItem('token') || '';
@@ -83,7 +103,9 @@ export class SalonesComponent {
       const salonesList = Array.isArray(data) ? data.map((s, idx) => ({
         id: s.id || idx,
         nombre: s.nombre,
-        edificio: s.edificio ?? s?.data?.edificio ?? ''
+        edificio_id: s.edificio_id,
+        edificioNombre: s?.edificio?.nombre || '',
+        capacidad: s.capacidad ?? 35
       })) : [];
       // Solo actualiza si hay cambios
       if (JSON.stringify(salonesList) !== localStorage.getItem('salonesCache')) {
@@ -101,9 +123,14 @@ export class SalonesComponent {
       return;
     }
 
+    if (!this.nuevoSalon.edificio_id) {
+      this.showToast('Selecciona un edificio para el salón', 'warning');
+      return;
+    }
+
     const duplicated = this.salones.some((s) =>
       s.nombre.trim().toLowerCase() === this.nuevoSalon.nombre.trim().toLowerCase()
-      && (s.edificio || '').trim().toLowerCase() === (this.nuevoSalon.edificio || '').trim().toLowerCase()
+      && s.edificio_id === this.nuevoSalon.edificio_id
     );
 
     if (duplicated) {
@@ -113,9 +140,9 @@ export class SalonesComponent {
 
     const body = {
       nombre: this.nuevoSalon.nombre,
-      data: {
-        edificio: (this.nuevoSalon.edificio || '').trim()
-      }
+      edificio_id: this.nuevoSalon.edificio_id,
+      capacidad: this.nuevoSalon.capacidad || 35,
+      data: {}
     };
     try {
       const res = await fetch('http://localhost:3000/salones', {
@@ -133,9 +160,11 @@ export class SalonesComponent {
       this.salones.push({
         id: data.id || Date.now(),
         nombre: data.nombre,
-        edificio: data.edificio ?? data?.data?.edificio ?? (this.nuevoSalon.edificio || '').trim()
+        edificio_id: data.edificio_id,
+        edificioNombre: this.edificios.find((e) => e.id === data.edificio_id)?.nombre || '',
+        capacidad: data.capacidad ?? 35
       });
-      this.nuevoSalon = { id: '', nombre: '', edificio: '' };
+      this.nuevoSalon = { id: '', nombre: '', edificio_id: this.nuevoSalon.edificio_id, capacidad: 35 };
       this.showToast('Salón creado correctamente', 'success');
     } catch (err) {
       this.showToast('No se pudo crear el salón', 'error');
@@ -143,8 +172,14 @@ export class SalonesComponent {
   }
 
   async eliminarSalon(id: string) {
-    const confirmacion = confirm('Â¿EstÃ¡s seguro de que deseas eliminar este salÃ³n?');
-    if (!confirmacion) return;
+    const confirmed = await this.confirmDialog.confirm({
+      title: 'Eliminar salón',
+      message: '¿Deseas eliminar este salón? Esta acción no se puede deshacer.',
+      confirmText: 'Sí, eliminar',
+      cancelText: 'Cancelar',
+      tone: 'danger',
+    });
+    if (!confirmed) return;
     try {
       const res = await fetch(`http://localhost:3000/salones/${id}`, {
         method: 'DELETE',
@@ -160,7 +195,13 @@ export class SalonesComponent {
 
   editarSalon(salon: salonesData) {
     this.editandoId = salon.id;
-    this.nuevoSalon = { ...salon };
+    this.nuevoSalon = {
+      id: salon.id,
+      nombre: salon.nombre,
+      edificio_id: salon.edificio_id,
+      capacidad: salon.capacidad || 35,
+      edificioNombre: salon.edificioNombre,
+    };
   }
 
   async guardarEdicion() {
@@ -173,7 +214,7 @@ export class SalonesComponent {
     const duplicated = this.salones.some((s) =>
       s.id !== this.editandoId
       && s.nombre.trim().toLowerCase() === this.nuevoSalon.nombre.trim().toLowerCase()
-      && (s.edificio || '').trim().toLowerCase() === (this.nuevoSalon.edificio || '').trim().toLowerCase()
+      && s.edificio_id === this.nuevoSalon.edificio_id
     );
 
     if (duplicated) {
@@ -183,9 +224,9 @@ export class SalonesComponent {
 
     const body: any = {
       nombre: this.nuevoSalon.nombre,
-      data: {
-        edificio: (this.nuevoSalon.edificio || '').trim()
-      }
+      edificio_id: this.nuevoSalon.edificio_id,
+      capacidad: this.nuevoSalon.capacidad || 35,
+      data: {}
     };
     try {
       const res = await fetch(`http://localhost:3000/salones/${this.editandoId}`, {
@@ -198,9 +239,11 @@ export class SalonesComponent {
       this.salones = this.salones.map(s => s.id === this.editandoId ? {
         id: this.editandoId!,
         nombre: body.nombre,
-        edificio: body.data.edificio
+        edificio_id: body.edificio_id,
+        edificioNombre: this.edificios.find((e) => e.id === body.edificio_id)?.nombre || '',
+        capacidad: body.capacidad
       } : s);
-      this.nuevoSalon = { id: '', nombre: '', edificio: '' };
+      this.nuevoSalon = { id: '', nombre: '', edificio_id: this.nuevoSalon.edificio_id, capacidad: 35 };
       this.editandoId = null;
       this.showToast('Salón editado correctamente', 'success');
     } catch (err) {
@@ -209,7 +252,7 @@ export class SalonesComponent {
   }
 
   cancelarEdicion() {
-    this.nuevoSalon = { id: '', nombre: '', edificio: '' };
+    this.nuevoSalon = { id: '', nombre: '', edificio_id: this.nuevoSalon.edificio_id, capacidad: 35 };
     this.editandoId = null;
   }
 }

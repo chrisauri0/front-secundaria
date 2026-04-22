@@ -1,0 +1,110 @@
+<div class="alumnos-container">
+  <div class="header-section">
+    <a routerLink="/dashboard" class="btn-back" title="Volver al Dashboard">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M12 19l-7-7 7-7" />
+      </svg>
+    </a>
+    <div class="header-text">
+      <h2 class="titulo-alumnos">Gestión de Alumnos</h2>
+      <p class="subtitle">Administra el padrón estudiantil</p>
+    </div>
+  </div>
+
+  <div class="card-form">
+    <form (ngSubmit)="guardar()" class="alumno-form">
+      <div class="inputs-grid">
+        <div class="input-group">
+          <label for="nombreAlumno">Nombre del alumno</label>
+          <input id="nombreAlumno" [(ngModel)]="nuevo.nombre" name="nombre" type="text" placeholder="Ej. Ana López"
+            required class="input-alumno" />
+        </div>
+
+        <div class="input-group">
+          <label for="direccionAlumno">Dirección</label>
+          <input id="direccionAlumno" [(ngModel)]="nuevo.direccion" name="direccion" type="text"
+            placeholder="Ej. Calle Hidalgo 20" class="input-alumno" />
+        </div>
+
+        <div class="input-group">
+          <label for="telefonoAlumno">Teléfono</label>
+          <input id="telefonoAlumno" [(ngModel)]="nuevo.telefono_contacto" name="telefono" type="text"
+            placeholder="Ej. 4421234567" class="input-alumno" />
+        </div>
+
+        <div class="input-group">
+          <label for="emailAlumno">Email de contacto</label>
+          <input id="emailAlumno" [(ngModel)]="nuevo.email_contacto" name="email" type="email"
+            placeholder="Ej. madre@familia.local" class="input-alumno" />
+        </div>
+
+        <div class="input-group input-group-wide">
+          <label for="grupoAlumno">Grupo</label>
+          <select id="grupoAlumno" [(ngModel)]="nuevo.grupo_id" name="grupo_id" class="input-alumno">
+            <option value="">Sin grupo</option>
+            <option *ngFor="let grupo of grupos" [value]="grupo.id">{{ getGrupoOcupacion(grupo) }}</option>
+          </select>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn-guardar">
+            {{ editandoId ? 'Guardar Cambios' : 'Agregar Alumno' }}
+          </button>
+          <button type="button" *ngIf="editandoId" (click)="cancelar()" class="btn-cancelar">
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="card-table">
+    <table class="tabla-alumnos">
+      <thead>
+        <tr>
+          <th class="th-id">#</th>
+          <th>Nombre</th>
+          <th>Dirección</th>
+          <th>Teléfono</th>
+          <th>Email</th>
+          <th>Grupo</th>
+          <th class="th-actions">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let alumno of alumnos; let i = index">
+          <td class="td-id">{{ i + 1 }}</td>
+          <td class="td-nombre">{{ alumno.nombre }}</td>
+          <td>{{ alumno.direccion || '-' }}</td>
+          <td>{{ alumno.telefono_contacto || '-' }}</td>
+          <td>{{ alumno.email_contacto || '-' }}</td>
+          <td>{{ getGrupoLabel(alumno.grupo_id) }}</td>
+          <td class="td-actions">
+            <button class="btn-icon btn-editar" (click)="editar(alumno)" title="Editar">
+              <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+            </button>
+            <button class="btn-icon btn-eliminar" (click)="eliminar(alumno.id)" title="Eliminar">
+              <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="alumnos.length === 0">
+          <td colspan="7" class="empty-state">
+            No hay alumnos registrados. ¡Agrega uno nuevo arriba!
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div *ngIf="toast" class="app-toast" [ngClass]="toastType">
+    {{ toast }}
+  </div>
+</div>

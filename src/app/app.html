@@ -17,19 +17,35 @@
                     </a>
                 </li>
                 <li>
+                    <a routerLink="/edificios" routerLinkActive="active" class="nav-link">
+                        <span class="nav-icon">
+                            <img src="/assets/svgs/room-svgrepo-com.svg" alt="Edificios" />
+                        </span>
+                        <span class="nav-text">Edificios</span>
+                    </a>
+                </li>
+                <li>
                     <a routerLink="/salones" routerLinkActive="active" class="nav-link">
                         <span class="nav-icon">
-                            <img src="/assets/svgs/room-svgrepo-com.svg" alt="Salones" />
+                            <img src="/assets/svgs/education-learning-svgrepo-com.svg" alt="Salones" />
                         </span>
                         <span class="nav-text">Salones</span>
                     </a>
                 </li>
                 <li>
-                    <a routerLink="/materias" routerLinkActive="active" class="nav-link">
+                    <a routerLink="/alumnos" routerLinkActive="active" class="nav-link">
                         <span class="nav-icon">
-                            <img src="assets/svgs/books-svgrepo-com.svg" alt="Materias" />
+                            <img src="assets/svgs/grupos-svgrepo-com.svg" alt="Alumnos" />
                         </span>
-                        <span class="nav-text">Materias</span>
+                        <span class="nav-text">Alumnos</span>
+                    </a>
+                </li>
+                <li>
+                    <a routerLink="/grupos" routerLinkActive="active" class="nav-link">
+                        <span class="nav-icon">
+                            <img src="/assets/svgs/grupos-svgrepo-com.svg" alt="Grupos" />
+                        </span>
+                        <span class="nav-text">Grupos</span>
                     </a>
                 </li>
                 <li>
@@ -42,19 +58,19 @@
                 </li>
 
                 <li>
-                    <a routerLink="/psicologos" routerLinkActive="active" class="nav-link">
+                    <a routerLink="/materias" routerLinkActive="active" class="nav-link">
                         <span class="nav-icon">
-                            <img src="/assets/svgs/brain-1-svgrepo-com.svg" alt="Psicologos" />
+                            <img src="assets/svgs/books-svgrepo-com.svg" alt="Materias" />
                         </span>
-                        <span class="nav-text">Psicologos</span>
+                        <span class="nav-text">Materias</span>
                     </a>
                 </li>
                 <li>
-                    <a routerLink="/grupos" routerLinkActive="active" class="nav-link">
+                    <a routerLink="/users" routerLinkActive="active" class="nav-link">
                         <span class="nav-icon">
-                            <img src="/assets/svgs/grupos-svgrepo-com.svg" alt="Grupos" />
+                            <img src="/assets/svgs/house-chimney-floor-svgrepo-com.svg" alt="Usuarios" />
                         </span>
-                        <span class="nav-text">Grupos</span>
+                        <span class="nav-text">Usuarios</span>
                     </a>
                 </li>
                 <li>
@@ -86,3 +102,5 @@
 <ng-template #soloLogin>
     <router-outlet></router-outlet>
 </ng-template>
+
+<app-confirm-dialog></app-confirm-dialog>

@@ -16,8 +16,16 @@ import { CommonModule } from '@angular/common';
 export class VerHorarios {
   diasSemana: string[] = ['Lun', 'Mar', 'Mie', 'Jue', 'Vie'];
   horas: string[] = [
-     '17', '18', '19', '20', '21'
+     '01', '02', '03', '04', '05', '06'
   ];
+  bloquesLabel: Record<string, string> = {
+    '01': '07:00-07:50',
+    '02': '07:50-08:40',
+    '03': '08:40-09:30',
+    '04': '09:50-10:40',
+    '05': '10:40-11:30',
+    '06': '11:30-12:20',
+  };
 
  
  horarios: any[] = [];
@@ -81,7 +89,7 @@ export class VerHorarios {
     const grid = this.getHorarioGrid();
     const body: any[] = [];
     for (const hora of this.horas) {
-      const row: any[] = [hora];
+      const row: any[] = [this.bloquesLabel[hora] || hora];
       for (const dia of this.diasSemana) {
         const clase = grid[hora][dia];
         if (clase) {
@@ -94,6 +102,9 @@ export class VerHorarios {
         }
       }
       body.push(row);
+      if (hora === '03') {
+        body.push(['RECESO', '09:30-09:50', '09:30-09:50', '09:30-09:50', '09:30-09:50', '09:30-09:50']);
+      }
     }
     autoTable(doc, {
       head,

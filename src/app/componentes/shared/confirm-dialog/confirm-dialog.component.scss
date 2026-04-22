@@ -1,0 +1,75 @@
+.confirm-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(16, 24, 40, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000;
+  padding: 1rem;
+}
+
+.confirm-card {
+  width: min(460px, 100%);
+  border-radius: 14px;
+  background: #ffffff;
+  border: 1px solid #dce3eb;
+  box-shadow: 0 16px 44px rgba(2, 36, 74, 0.2);
+  padding: 1rem 1rem 0.85rem;
+
+  h3 {
+    margin: 0;
+    color: #005baa;
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+
+  p {
+    margin: 0.65rem 0 1rem;
+    color: #344054;
+    font-size: 0.95rem;
+    line-height: 1.45;
+  }
+}
+
+.confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.55rem;
+
+  button {
+    border: none;
+    border-radius: 9px;
+    padding: 0.5rem 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .btn-cancel {
+    background: #f5f7fa;
+    color: #344054;
+    border: 1px solid #dce3eb;
+
+    &:hover {
+      background: #eaeef3;
+    }
+  }
+
+  .btn-confirm {
+    background: #005baa;
+    color: #ffffff;
+
+    &:hover {
+      background: #004a8d;
+    }
+
+    &.danger {
+      background: #d13f3f;
+
+      &:hover {
+        background: #b93434;
+      }
+    }
+  }
+}

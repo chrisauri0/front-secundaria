@@ -22,18 +22,36 @@
                 </div>
 
                 <div class="input-group">
-                    <label for="salonMateria">Salón</label>
-                    <select id="salonMateria" [(ngModel)]="nuevaMateria.salones" name="salones" required
-                        class="input-materia">
-                        <option value="" disabled selected>Selecciona un salón</option>
-                        <option *ngFor="let salon of salones" [value]="salon">{{ salon }}</option>
+                    <label for="gradoMateria">Grado</label>
+                    <select id="gradoMateria" [(ngModel)]="nuevaMateria.grado" name="grado" class="input-materia" required>
+                        <option [ngValue]="1">1° de secundaria</option>
+                        <option [ngValue]="2">2° de secundaria</option>
+                        <option [ngValue]="3">3° de secundaria</option>
                     </select>
+                </div>
+
+                <div class="input-group">
+                    <label>Salones permitidos (1 o 2)</label>
+                    <div class="check-list salones-list">
+                        <label *ngFor="let salon of salones" class="check-item">
+                            <input type="checkbox" [checked]="selectedSalones.includes(salon)"
+                                (change)="toggleSalonSelection(salon, $any($event.target).checked)" />
+                            <span>{{ salon }}</span>
+                        </label>
+                    </div>
                 </div>
 
                 <div class="input-group">
                     <label for="horasSemana">Horas/Semana</label>
                     <input id="horasSemana" type="number" [(ngModel)]="nuevaMateria.horas_semana" name="horas_semana"
                         placeholder="Ej. 4" min="1" required class="input-materia" />
+                </div>
+
+                <div class="input-group">
+                    <label class="check-item">
+                        <input type="checkbox" [(ngModel)]="nuevaMateria.permitir_doble_bloque" name="permitir_doble_bloque" />
+                        <span>Permitir 2 horas seguidas el mismo día</span>
+                    </label>
                 </div>
 
                 <div class="form-actions">
@@ -54,7 +72,9 @@
                 <tr>
                     <th class="th-id">#</th>
                     <th>Nombre</th>
+                    <th>Grado</th>
                     <th>Horas/Semana</th>
+                    <th>2 seguidas</th>
                     <th>Salones</th>
                     <th class="th-actions">Acciones</th>
                 </tr>
@@ -63,7 +83,9 @@
                 <tr *ngFor="let materia of materias; let i = index">
                     <td class="td-id">{{ i + 1 }}</td>
                     <td class="td-nombre">{{ materia.nombre }}</td>
+                    <td>{{ materia.grado ? getGradoLabel(materia.grado) : 'Sin grado' }}</td>
                     <td>{{ materia.horas_semana }}</td>
+                    <td>{{ materia.permitir_doble_bloque ? 'Sí' : 'No' }}</td>
                     <td>{{ formatSalones(materia.salones) }}</td>
                     <td class="td-actions">
                         <button class="btn-icon btn-editar" (click)="editarMateria(materia)" title="Editar">
@@ -81,7 +103,7 @@
                     </td>
                 </tr>
                 <tr *ngIf="materias.length === 0">
-                    <td colspan="6" class="empty-state">
+                    <td colspan="7" class="empty-state">
                         No hay materias registradas. ¡Agrega una nueva arriba!
                     </td>
                 </tr>

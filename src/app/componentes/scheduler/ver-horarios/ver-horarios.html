@@ -28,7 +28,7 @@
                 </thead>
                 <tbody>
                     <tr *ngFor="let hora of horas">
-                        <td class="hora-label">{{ hora }}</td>
+                        <td class="hora-label">{{ bloquesLabel[hora] || hora }}</td>
                         <td *ngFor="let dia of diasSemana">
                             <ng-container *ngIf="getHorarioGrid()[hora][dia]; else vacio">
                                 <div class="clase-celda">
@@ -41,6 +41,10 @@
                                 <div class="clase-celda vacio"></div>
                             </ng-template>
                         </td>
+                    </tr>
+                    <tr>
+                        <td class="hora-label">RECESO</td>
+                        <td *ngFor="let dia of diasSemana">09:30-09:50</td>
                     </tr>
                 </tbody>
             </table>

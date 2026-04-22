@@ -126,10 +126,131 @@ $warning-border: #ffecb3;
   align-items: center;
   gap: 1.5rem;
 
-  .actions-wrapper {
-    display: flex;
-    justify-content: center;
+  .filter-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
     width: 100%;
+
+    @media (max-width: 900px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .inline-toggle {
+    justify-content: flex-end;
+    align-items: flex-end;
+  }
+
+  .selectors-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    width: 100%;
+
+    @media (max-width: 900px) {
+      grid-template-columns: 1fr;
+    }
+
+    &.disabled {
+      opacity: 0.55;
+    }
+  }
+
+  .selector-card {
+    border: 1px solid $border;
+    border-radius: 12px;
+    background: color.adjust($secondary, $lightness: 2%);
+    padding: 0.9rem;
+  }
+
+  .selector-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.6rem;
+
+    h4 {
+      margin: 0;
+      color: $primary;
+      font-size: 1rem;
+    }
+  }
+
+  .check-list {
+    display: grid;
+    gap: 0.45rem;
+    max-height: 220px;
+    overflow: auto;
+    padding-right: 0.3rem;
+  }
+
+  .checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-size: 0.92rem;
+    color: $text;
+  }
+
+  .checkbox-item input[type='checkbox'] {
+    accent-color: $primary;
+    width: 16px;
+    height: 16px;
+  }
+
+  .empty-list {
+    margin: 0;
+    color: color.adjust($text, $lightness: 25%);
+    font-style: italic;
+    font-size: 0.9rem;
+  }
+
+  .input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: color.adjust($text, $lightness: 10%);
+      margin-left: 2px;
+    }
+  }
+
+  .scope-group {
+    grid-column: 1 / -1;
+  }
+
+  .input-filter {
+    width: 100%;
+    padding: 0.9rem 1rem;
+    border: 1px solid $border;
+    border-radius: 10px;
+    font-size: 0.98rem;
+    background: $secondary;
+    color: $text;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+
+    &:focus {
+      outline: none;
+      border-color: $primary;
+      background: $white;
+      box-shadow: 0 0 0 3px rgba($primary, 0.1);
+    }
+
+    &.scope-filter {
+      min-height: 48px;
+    }
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    margin-top: 0.25rem;
   }
 
   .btn-generate {
@@ -184,6 +305,133 @@ $warning-border: #ffecb3;
       background: color.adjust($danger, $lightness: 35%);
       color: $danger-hover;
       border: 1px solid color.adjust($danger, $lightness: 20%);
+    }
+
+    .status-main {
+      margin: 0;
+      line-height: 1.45;
+    }
+
+    .missing-summary {
+      margin-top: 0.9rem;
+      text-align: left;
+      border-top: 1px solid rgba(0, 0, 0, 0.08);
+      padding-top: 0.75rem;
+    }
+
+    .missing-title {
+      margin: 0 0 0.6rem;
+      font-weight: 700;
+      color: color.adjust($text, $lightness: -5%);
+      font-size: 0.9rem;
+    }
+
+    .missing-group {
+      display: flex;
+      gap: 0.55rem;
+      align-items: flex-start;
+      margin-bottom: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .missing-group-name {
+      min-width: 2.1rem;
+      font-weight: 700;
+      color: color.adjust($primary, $lightness: -5%);
+      font-size: 0.86rem;
+    }
+
+    .missing-chips {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    .missing-chip {
+      background: $white;
+      border: 1px solid color.adjust($border, $lightness: -5%);
+      border-radius: 999px;
+      padding: 0.18rem 0.55rem;
+      font-size: 0.8rem;
+      color: color.adjust($text, $lightness: 8%);
+      font-weight: 600;
+    }
+
+    .missing-tip {
+      margin: 0.6rem 0 0;
+      font-size: 0.82rem;
+      color: color.adjust($text, $lightness: 10%);
+    }
+  }
+
+  .move-editor-card {
+    width: 100%;
+    border: 1px solid color.adjust($primary, $lightness: 32%);
+    background: color.adjust($primary, $lightness: 59%);
+    border-radius: 12px;
+    padding: 1rem;
+
+    h4 {
+      margin: 0 0 0.35rem;
+      color: color.adjust($primary, $lightness: -8%);
+      font-size: 1rem;
+    }
+
+    p {
+      margin: 0 0 0.9rem;
+      color: color.adjust($text, $lightness: 10%);
+      font-size: 0.92rem;
+    }
+  }
+
+  .move-editor-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.8rem;
+
+    @media (max-width: 900px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .move-actions {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+
+    button {
+      border: none;
+      border-radius: 8px;
+      padding: 0.55rem 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-cancel-move {
+      background: $white;
+      color: color.adjust($text, $lightness: 10%);
+      border: 1px solid $border;
+
+      &:hover:not(:disabled) {
+        background: color.adjust($secondary, $lightness: -2%);
+      }
+    }
+
+    .btn-apply-move {
+      background: $primary;
+      color: $white;
+
+      &:hover:not(:disabled) {
+        background: color.adjust($primary, $lightness: -7%);
+      }
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
     }
   }
 }
@@ -415,6 +663,63 @@ $warning-border: #ffecb3;
         background: $accent;
         border-radius: 50%;
       }
+    }
+
+    .prof-class-entry {
+      border-bottom: 1px dashed color.adjust($border, $lightness: -3%);
+      margin-bottom: 0.35rem;
+      padding-bottom: 0.35rem;
+
+      &:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+      }
+    }
+
+    .btn-move {
+      margin-top: 0.4rem;
+      align-self: flex-end;
+      background: $white;
+      border: 1px solid color.adjust($primary, $lightness: 28%);
+      color: color.adjust($primary, $lightness: -8%);
+      border-radius: 999px;
+      padding: 0.2rem 0.6rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: color.adjust($primary, $lightness: 50%);
+      }
+    }
+  }
+
+  .receso-row {
+    .receso-time {
+      font-weight: 700;
+      color: color.adjust($primary, $lightness: -8%);
+      background: color.adjust($primary, $lightness: 54%);
+    }
+
+    .receso-merged {
+      background: color.adjust($primary, $lightness: 54%);
+      border-left: none;
+      padding: 0.35rem 0.5rem;
+    }
+
+    .receso-pill {
+      width: 100%;
+      background: color.adjust($primary, $lightness: 43%);
+      color: color.adjust($primary, $lightness: -8%);
+      border: 1px solid color.adjust($primary, $lightness: 28%);
+      border-radius: 8px;
+      text-align: center;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      padding: 0.45rem 0.6rem;
+      font-size: 0.85rem;
     }
   }
 }
