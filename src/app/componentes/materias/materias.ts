@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { ConfirmDialogService } from '../shared/confirm-dialog/confirm-dialog.service';
+import { environment } from '../../../environments/environment';
 
 export interface Materia {
   id: string;
@@ -139,7 +140,7 @@ export class Materias {
 
   async cargarSalones() {
     try {
-      const res = await fetch('http://localhost:3000/salones', {
+      const res = await fetch(`${environment.apiBaseUrl}/salones`, {
         headers: this.getAuthHeaders()
       });
       if (!res.ok) throw new Error('Error al obtener salones');
@@ -167,7 +168,7 @@ export class Materias {
 
     try {
 
-      const resList = await fetch('http://localhost:3000/materias', {
+      const resList = await fetch(`${environment.apiBaseUrl}/materias`, {
         headers: this.getAuthHeaders()
       });
       if (!resList.ok) throw new Error('Error al obtener materias');
@@ -218,7 +219,7 @@ export class Materias {
     }
 
     try {
-      const res = await fetch('http://localhost:3000/materias', {
+      const res = await fetch(`${environment.apiBaseUrl}/materias`, {
         method: 'POST',
         headers: this.getAuthHeaders(true),
         body: JSON.stringify(body)
@@ -272,7 +273,7 @@ export class Materias {
     }
 
     try {
-      const res = await fetch(`http://localhost:3000/materias/${this.editandoId}`, {
+      const res = await fetch(`${environment.apiBaseUrl}/materias/${this.editandoId}`, {
         method: 'PATCH',
         headers: this.getAuthHeaders(true),
         body: JSON.stringify(body)
@@ -308,7 +309,7 @@ export class Materias {
     if (!confirmed) return;
 
     try {
-      const res = await fetch(`http://localhost:3000/materias/${id}`, {
+      const res = await fetch(`${environment.apiBaseUrl}/materias/${id}`, {
         method: 'DELETE',
         headers: this.getAuthHeaders()
       });

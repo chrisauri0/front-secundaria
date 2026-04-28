@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { ConfirmDialogService } from '../shared/confirm-dialog/confirm-dialog.service';
+import { environment } from '../../../environments/environment';
 export interface salonesData {
   id: string;
   nombre: string;
@@ -49,7 +50,7 @@ export class SalonesComponent {
   }
   async cargarEdificios() {
     try {
-      const res = await fetch('http://localhost:3000/edificios', {
+      const res = await fetch(`${environment.apiBaseUrl}/edificios`, {
         headers: this.getAuthHeaders()
       });
       if (!res.ok) throw new Error('Error al obtener edificios');
@@ -123,7 +124,7 @@ export class SalonesComponent {
     }
 
     try {
-      const res = await fetch('http://localhost:3000/salones', {
+      const res = await fetch(`${environment.apiBaseUrl}/salones`, {
         headers: this.getAuthHeaders()
       });
       if (!res.ok) throw new Error('Error al obtener salones');
@@ -174,7 +175,7 @@ export class SalonesComponent {
       data: {}
     };
     try {
-      const res = await fetch('http://localhost:3000/salones', {
+      const res = await fetch(`${environment.apiBaseUrl}/salones`, {
         method: 'POST',
         headers: this.getAuthHeaders(true),
         body: JSON.stringify(body)
@@ -210,7 +211,7 @@ export class SalonesComponent {
     });
     if (!confirmed) return;
     try {
-      const res = await fetch(`http://localhost:3000/salones/${id}`, {
+      const res = await fetch(`${environment.apiBaseUrl}/salones/${id}`, {
         method: 'DELETE',
         headers: this.getAuthHeaders()
       });
@@ -258,7 +259,7 @@ export class SalonesComponent {
       data: {}
     };
     try {
-      const res = await fetch(`http://localhost:3000/salones/${this.editandoId}`, {
+      const res = await fetch(`${environment.apiBaseUrl}/salones/${this.editandoId}`, {
         method: 'PATCH',
         headers: this.getAuthHeaders(true),
         body: JSON.stringify(body)

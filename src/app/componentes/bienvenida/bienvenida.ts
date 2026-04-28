@@ -2,6 +2,7 @@
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-bienvenida',
@@ -19,7 +20,7 @@ export class BienvenidaComponent {
 
   async iniciarSesion() {
     try {
-      const res = await fetch('http://localhost:3000/users/login-admin', {
+      const res = await fetch(`${environment.apiBaseUrl}/users/login-admin`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

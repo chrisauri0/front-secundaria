@@ -3,6 +3,7 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { ConfirmDialogService } from '../shared/confirm-dialog/confirm-dialog.service';
+import { environment } from '../../../environments/environment';
 
 interface Edificio {
   id: string;
@@ -33,7 +34,7 @@ export class EdificiosComponent {
   }
 
   async cargar() {
-    const res = await fetch('http://localhost:3000/edificios');
+    const res = await fetch(`${environment.apiBaseUrl}/edificios`);
     const data = await res.json();
     this.edificios = Array.isArray(data) ? data : [];
   }
@@ -76,8 +77,8 @@ export class EdificiosComponent {
     const isEdit = Boolean(this.editandoId);
 
     const url = this.editandoId
-      ? `http://localhost:3000/edificios/${this.editandoId}`
-      : 'http://localhost:3000/edificios';
+      ? `${environment.apiBaseUrl}/edificios/${this.editandoId}`
+      : `${environment.apiBaseUrl}/edificios`;
     const method = this.editandoId ? 'PATCH' : 'POST';
 
     const res = await fetch(url, {
@@ -118,7 +119,7 @@ export class EdificiosComponent {
       tone: 'danger',
     });
     if (!confirmed) return;
-    const res = await fetch(`http://localhost:3000/edificios/${id}`, { method: 'DELETE' });
+    const res = await fetch(`${environment.apiBaseUrl}/edificios/${id}`, { method: 'DELETE' });
     if (res.ok) {
       await this.cargar();
       this.showToast('Edificio eliminado correctamente', 'success');

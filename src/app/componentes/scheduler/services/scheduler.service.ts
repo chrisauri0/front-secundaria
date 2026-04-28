@@ -1,12 +1,13 @@
 ﻿import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { environment } from '../../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SchedulerService {
-  private apiUrl = 'http://localhost:3000/scheduler'; // Ajusta segÃºn tu backend
+  private apiUrl = `${environment.apiBaseUrl}/scheduler`;
   private cacheKey = 'horariosCache';
 
 

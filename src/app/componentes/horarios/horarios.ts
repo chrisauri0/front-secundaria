@@ -2,6 +2,7 @@
 import { CommonModule } from '@angular/common';
 import resultado from './resultado.json';
 import { OrderByStartPipe } from './orderPipe';
+import { environment } from '../../../environments/environment';
 
 // datos para los horarios
 import { salonesData } from '../salones/salones';
@@ -32,7 +33,7 @@ salones: salonesData[] = [];
 
  async cargarSalones() {
     try {
-      const res = await fetch('http://localhost:3000/salones');
+      const res = await fetch(`${environment.apiBaseUrl}/salones`);
       if (!res.ok) throw new Error('Error al obtener salones');
       const data = await res.json();
       this.salones = Array.isArray(data) ? data.map((s, idx) => ({

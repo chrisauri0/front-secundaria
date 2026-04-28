@@ -3,6 +3,7 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { ConfirmDialogService } from '../shared/confirm-dialog/confirm-dialog.service';
+import { environment } from '../../../environments/environment';
 
 interface UserRow {
   id: string;
@@ -31,7 +32,7 @@ export class UsersComponent {
   }
 
   async cargar() {
-    const res = await fetch('http://localhost:3000/users');
+    const res = await fetch(`${environment.apiBaseUrl}/users`);
     const data = await res.json();
     this.users = Array.isArray(data) ? data : [];
   }
@@ -40,7 +41,7 @@ export class UsersComponent {
     if (!this.nuevo.email.trim()) return;
 
     if (this.editandoId) {
-      const res = await fetch(`http://localhost:3000/users/${this.editandoId}`, {
+      const res = await fetch(`${environment.apiBaseUrl}/users/${this.editandoId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -51,7 +52,7 @@ export class UsersComponent {
       });
       if (!res.ok) return;
     } else {
-      const res = await fetch('http://localhost:3000/users/register', {
+      const res = await fetch(`${environment.apiBaseUrl}/users/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(this.nuevo),
@@ -100,7 +101,7 @@ export class UsersComponent {
       tone: 'danger',
     });
     if (!confirmed) return;
-    const res = await fetch(`http://localhost:3000/users/${id}`, { method: 'DELETE' });
+    const res = await fetch(`${environment.apiBaseUrl}/users/${id}`, { method: 'DELETE' });
     if (res.ok) await this.cargar();
   }
 }

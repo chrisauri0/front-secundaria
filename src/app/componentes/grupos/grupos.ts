@@ -6,6 +6,7 @@ import { ProfesorData } from '../profesores/profesores';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { RouterModule } from '@angular/router';
 import { ConfirmDialogService } from '../shared/confirm-dialog/confirm-dialog.service';
+import { environment } from '../../../environments/environment';
 
 
 export interface Grupo {
@@ -101,7 +102,7 @@ export class GruposComponent {
 
   async cargarTutores(): Promise<void> {
     try {
-      const res = await fetch('http://localhost:3000/profesores/tutores');
+      const res = await fetch(`${environment.apiBaseUrl}/profesores/tutores`);
       if (!res.ok) throw new Error(`Error HTTP ${res.status}`);
       const data = await res.json();
 
@@ -125,7 +126,7 @@ export class GruposComponent {
 
   async cargarGrupos() {
     try {
-      const res = await fetch('http://localhost:3000/grupos');
+      const res = await fetch(`${environment.apiBaseUrl}/grupos`);
       if (!res.ok) throw new Error('Error al obtener grupos');
       const data = await res.json();
       this.grupos = Array.isArray(data)
@@ -145,7 +146,7 @@ export class GruposComponent {
 
   async cargarGrupoPorId(id: string) {
     try {
-      const res = await fetch(`http://localhost:3000/grupos/${id}`);
+      const res = await fetch(`${environment.apiBaseUrl}/grupos/${id}`);
       if (!res.ok) throw new Error('Error al obtener grupo');
       return await res.json();
     } catch (err) {
@@ -178,7 +179,7 @@ export class GruposComponent {
       data: this.nuevoGrupo.data || {}
     };
     try {
-      const res = await fetch('http://localhost:3000/grupos', {
+      const res = await fetch(`${environment.apiBaseUrl}/grupos`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
@@ -232,7 +233,7 @@ export class GruposComponent {
       data: this.nuevoGrupo.data || {}
     };
     try {
-      const res = await fetch(`http://localhost:3000/grupos/${this.grupoEditando.id}`, {
+      const res = await fetch(`${environment.apiBaseUrl}/grupos/${this.grupoEditando.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
@@ -276,7 +277,7 @@ export class GruposComponent {
     if (!confirmed) return;
 
     try {
-      const res = await fetch(`http://localhost:3000/grupos/${id}`, {
+      const res = await fetch(`${environment.apiBaseUrl}/grupos/${id}`, {
         method: 'DELETE'
       });
       if (!res.ok) throw new Error('Error al eliminar el grupo');

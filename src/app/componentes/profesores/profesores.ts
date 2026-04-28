@@ -5,6 +5,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { Materia } from '../materias/materias';
 import { RouterModule } from '@angular/router';
 import { ConfirmDialogService } from '../shared/confirm-dialog/confirm-dialog.service';
+import { environment } from '../../../environments/environment';
 
 export interface ProfesorData {
   profesor_id: string;
@@ -92,7 +93,7 @@ export class ProfesoresComponent {
 
     // Siempre consulta el backend para obtener el hash actual
     try {
-      const res = await fetch('http://localhost:3000/materias/hash', {
+      const res = await fetch(`${environment.apiBaseUrl}/materias/hash`, {
         headers: this.getAuthHeaders()
       });
       if (!res.ok) throw new Error('Error al obtener hash de materias');
@@ -102,7 +103,7 @@ export class ProfesoresComponent {
         return;
       }
       // Si el hash cambiÃ³, pide la lista actualizada
-      const resList = await fetch('http://localhost:3000/materias', {
+      const resList = await fetch(`${environment.apiBaseUrl}/materias`, {
         headers: this.getAuthHeaders()
       });
       if (!resList.ok) throw new Error('Error al obtener materias');
@@ -178,7 +179,7 @@ export class ProfesoresComponent {
 
 
     try {
-      const res = await fetch('http://localhost:3000/profesores');
+      const res = await fetch(`${environment.apiBaseUrl}/profesores`);
       if (!res.ok) throw new Error('Error al obtener profesores');
       const data = await res.json();
       const newJson = JSON.stringify(data);
@@ -224,7 +225,7 @@ export class ProfesoresComponent {
     }
 
     try {
-      const res = await fetch('http://localhost:3000/profesores', {
+      const res = await fetch(`${environment.apiBaseUrl}/profesores`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
@@ -268,7 +269,7 @@ export class ProfesoresComponent {
     }
 
     try {
-      const res = await fetch(`http://localhost:3000/profesores/${this.editandoId}`, {
+      const res = await fetch(`${environment.apiBaseUrl}/profesores/${this.editandoId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
@@ -307,7 +308,7 @@ export class ProfesoresComponent {
     });
     if (!confirmed) return;
     try {
-      const res = await fetch(`http://localhost:3000/profesores/${profesor_id}`, {
+      const res = await fetch(`${environment.apiBaseUrl}/profesores/${profesor_id}`, {
         method: 'DELETE'
       });
       if (!res.ok) throw new Error('Error al eliminar el profesor');

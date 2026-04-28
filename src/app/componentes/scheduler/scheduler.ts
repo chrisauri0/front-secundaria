@@ -7,6 +7,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { VerHorarios } from './ver-horarios/ver-horarios';
 import { RouterModule } from '@angular/router';
+import { environment } from '../../../environments/environment';
 
 type ScopeMode = 'todo' | 'grado' | 'grupo' | 'materia' | 'personalizado';
 
@@ -232,7 +233,7 @@ export class SchedulerComponent {
 
   async cargarGruposDisponibles() {
     try {
-      const res = await fetch('http://localhost:3000/grupos', {
+      const res = await fetch(`${environment.apiBaseUrl}/grupos`, {
         headers: this.getAuthHeaders(),
       });
       if (!res.ok) throw new Error('Error al obtener grupos');
@@ -246,7 +247,7 @@ export class SchedulerComponent {
 
   async cargarMateriasDisponibles() {
     try {
-      const res = await fetch('http://localhost:3000/materias', {
+      const res = await fetch(`${environment.apiBaseUrl}/materias`, {
         headers: this.getAuthHeaders(),
       });
       if (!res.ok) throw new Error('Error al obtener materias');
@@ -372,7 +373,7 @@ export class SchedulerComponent {
 
     this.filling = true;
     try {
-      const res = await fetch('http://localhost:3000/scheduler/manual-add', {
+      const res = await fetch(`${environment.apiBaseUrl}/scheduler/manual-add`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -416,7 +417,7 @@ export class SchedulerComponent {
 
     this.moving = true;
     try {
-      const res = await fetch('http://localhost:3000/scheduler/manual-move', {
+      const res = await fetch(`${environment.apiBaseUrl}/scheduler/manual-move`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -471,7 +472,7 @@ export class SchedulerComponent {
 
   async cargarHorariosCreados() {
     try {
-      const res = await fetch('http://localhost:3000/scheduler/allschedules');
+      const res = await fetch(`${environment.apiBaseUrl}/scheduler/allschedules`);
       if (!res.ok) throw new Error('Error al obtener horarios creados');
       const data = await res.json();
       console.log('Horarios creados:', data);
@@ -543,7 +544,7 @@ export class SchedulerComponent {
       }
     }
 
-    fetch('http://localhost:3000/scheduler/generate', {
+    fetch(`${environment.apiBaseUrl}/scheduler/generate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)

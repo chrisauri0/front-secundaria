@@ -3,6 +3,7 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { ConfirmDialogService } from '../shared/confirm-dialog/confirm-dialog.service';
+import { environment } from '../../../environments/environment';
 
 interface GrupoOption {
   id: string;
@@ -50,13 +51,13 @@ export class AlumnosComponent {
   }
 
   async cargarGrupos() {
-    const res = await fetch('http://localhost:3000/grupos');
+    const res = await fetch(`${environment.apiBaseUrl}/grupos`);
     const data = await res.json();
     this.grupos = Array.isArray(data) ? data : [];
   }
 
   async cargarAlumnos() {
-    const res = await fetch('http://localhost:3000/alumnos');
+    const res = await fetch(`${environment.apiBaseUrl}/alumnos`);
     const data = await res.json();
     this.alumnos = Array.isArray(data) ? data : [];
   }
@@ -116,8 +117,8 @@ export class AlumnosComponent {
     };
 
     const url = this.editandoId
-      ? `http://localhost:3000/alumnos/${this.editandoId}`
-      : 'http://localhost:3000/alumnos';
+      ? `${environment.apiBaseUrl}/alumnos/${this.editandoId}`
+      : `${environment.apiBaseUrl}/alumnos`;
     const method = this.editandoId ? 'PATCH' : 'POST';
 
     const res = await fetch(url, {
@@ -158,7 +159,7 @@ export class AlumnosComponent {
       tone: 'danger',
     });
     if (!confirmed) return;
-    const res = await fetch(`http://localhost:3000/alumnos/${id}`, { method: 'DELETE' });
+    const res = await fetch(`${environment.apiBaseUrl}/alumnos/${id}`, { method: 'DELETE' });
     if (res.ok) {
       await this.cargarAlumnos();
       this.show('Alumno eliminado', 'success');
