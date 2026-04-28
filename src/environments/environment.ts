@@ -14,5 +14,5 @@ export const environment = {
 		runtimeEnv.__env?.API_BASE_URL ??
 		metaEnv?.['API_BASE_URL'] ??
 		metaEnv?.['VITE_API_BASE_URL'] ??
-		'http://localhost:3000'
+		'http://localhost:https://back-secundaria.onrender.com'
 };
